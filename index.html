@@ -20,7 +20,7 @@
       max-width: 650px;
       font-size: 12px;
       color: #333;
-      line-height: 1.4;
+      line-height: 1.5;
     }
 
     h1 {
@@ -126,11 +126,15 @@
     }
 
     /* Responsividade simples */
-    @media (max-width: 700px) {
-      body {
-        padding: 10px;
-        font-size: 12px;
-      }
+  @media (max-width: 700px) {
+    td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 8px;
+      border-bottom: 1px solid #eee;
+      position: relative;
+    }
       h1 {
         font-size: 1.5rem;
       }
@@ -146,7 +150,7 @@
         border-radius: 8px;
         box-shadow: 0 1px 4px rgb(0 0 0 / 0.1);
         background: white;
-        padding: 10px;
+        padding: 8px;
       }
       td {
         text-align: right;
@@ -158,15 +162,16 @@
       td.left {
         text-align: left;
       }
-      td::before {
-        position: absolute;
-        left: 10px;
-        width: 45%;
-        white-space: nowrap;
-        font-weight: 600;
-        text-align: left;
-        color: #666;
-      }
+  td[data-label]::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    width: 45%;
+    white-space: nowrap;
+    font-weight: bold;
+    color: #666;
+    text-align: left;
+  }
       /* Labels dos dados - você pode personalizar para cada tabela via JS ou manual */
       table:nth-of-type(1) td:nth-of-type(1)::before { content: "Item"; }
       table:nth-of-type(1) td:nth-of-type(2)::before { content: "Dados do produto"; }
@@ -177,6 +182,7 @@
 
     .moeda-cambio-cell {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
       align-items: center;
       justify-content: flex-start;
@@ -184,6 +190,7 @@
     #moeda, #cambio {
       width: 150px;
       text-align: left;
+      padding: 1px;
     }
 	
   </style>
@@ -196,14 +203,17 @@
 
 Esta ferramenta simula o calculo de impostos na importação com base na DI e atualização da Reforma Tributária, incluindo os novos impostos IBS, CBS e IS.<br>
 
-Informe os dados desejados e percentuais dos impostos, o calculo é automático: <p>
+<p>- Informe os dados desejados e percentuais dos impostos, o calculo é automático:</p>
 
-  <table>
-    <tbody>
-      <tr>
-        <th class="left">Moeda e Câmbio:</th>
-        <td class="moeda-cambio-cell">
-          <select id="moeda" aria-label="Selecione a moeda">
+     <!-- Seção Moeda e Câmbio -->
+    <section aria-labelledby="sec-cambio">
+      <h3 id="sec-cambio" data-i18n="currency_and_rate">CONVERSÃO</h3>
+      <fieldset>
+        <legend class="sr-only" data-i18n="currency_and_rate">Selecione</legend>
+
+        <div class="form-group">
+          <label for="moeda" data-i18n="select_currency">Moeda</label>
+          <select id="moeda" name="moeda">
             <option value="USD-BRL" selected>Dólar (USD)</option>
             <option value="EUR-BRL">Euro (EUR)</option>
             <option value="GBP-BRL">Libra Esterlina (GBP)</option>
@@ -219,17 +229,31 @@ Informe os dados desejados e percentuais dos impostos, o calculo é automático:
             <option value="INR-BRL">Rupia Indiana (INR)</option>
             <option value="ZAR-BRL">Rand Sul-Africano (ZAR)</option>
           </select>
-          <input type="text" id="cambio" value="5,8808" aria-label="Taxa de câmbio" />
-        </td>
-      </tr>
-    </tbody>
-  </table>
+        </div>
 
-  <h2>COMPOSIÇÃO</h2>
+        <div class="form-group">
+          <label for="cambio" data-i18n="exchange_rate">Taxa de câmbio ou Digite</label>
+          <div class="input-with-icon">
+            <input
+              type="text"
+              id="cambio"
+              name="cambio"
+              inputmode="decimal"
+              required
+              aria-describedby="cambio-error"
+            />
+            <div id="cambio-loading" class="loading-spinner" aria-hidden="true"></div>
+          </div>
+          <div id="cambio-error" class="error-message" role="alert"></div>
+        </div>
+      </fieldset>
+    </section>
+
+  <h3>COMPOSIÇÃO</h3>
   <table>
     <thead>
       <tr>
-        <th class="left">ITEM</th>
+        <th class="left">Item</th>
         <th>Dados do produto</th>
         <th>Total</th>
         <th>Vl R$</th>
@@ -237,43 +261,47 @@ Informe os dados desejados e percentuais dos impostos, o calculo é automático:
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td class="left">Quantidade:</td>
-        <td><input id="quantidade" class="taxa" value="10,000" min="0,001" step="any" aria-label="Quantidade" /></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td class="left">Vl Produto FOB ($)</td>
-        <td><input id="fob" class="taxa" value="27,758" aria-label="Valor FOB em moeda estrangeira" /></td>
-        <td id="totalFOB"></td>
-        <td id="vlFOB"></td>
-        <td id="totalFOBR"></td>
-      </tr>
-      <tr>
-        <td class="left">Frete internacional ($)</td>
-        <td><input id="frete" class="taxa" value="1,02" aria-label="Frete internacional" /></td>
-        <td></td>
-        <td id="vlFrete"></td>
-        <td id="totalFreteR"></td>
-      </tr>
-      <tr>
-        <td class="left">Seguro internacional ($)</td>
-        <td><input id="seguro" class="taxa" value="0,00" aria-label="Seguro internacional" /></td>
-        <td></td>
-        <td id="vlSeguro"></td>
-        <td id="totalSeguroR"></td>
-      </tr>
+<tr>
+  <td class="left">Quantidade:</td>
+  <td data-label="Quantidade">
+    <input id="quantidade" class="taxa" value="10,000" min="0,001" step="any" aria-label="Quantidade" />
+  </td>
+
+<!-- Faça o mesmo para cada <td> que representa um campo de dados visível em telas menores -->
+<tr>
+  <td class="left">Vl Produto FOB ($)</td>
+  <td data-label="Vl Produto FOB ($)"><input id="fob" class="taxa" value="27,758" aria-label="Valor FOB em moeda estrangeira" /></td>
+  <td data-label="Total" id="totalFOB"></td>
+  <td data-label="Vl R$" id="vlFOB"></td>
+  <td data-label="Total R$" id="totalFOBR"></td>
+</tr>
+
+<tr>
+  <td class="left">Frete internacional ($)</td>
+
+  <td data-label="Frete internacional ($)"><input id="frete" class="taxa" value="1,02" aria-label="Frete internacional" /></td>
+  <td data-label="Total"></td>
+  <td data-label="Vl R$" id="vlFrete"></td>
+  <td data-label="Total R$" id="totalFreteR"></td>
+</tr>
+<tr>
+  <td class="left">Seguro internacional ($)</td>
+  <td data-label="Seguro internacional ($)"><input id="seguro" class="taxa" value="0,00" aria-label="Seguro internacional" /></td>
+  <td data-label="Total"></td>
+  <td data-label="Vl R$" id="vlSeguro"></td>
+  <td data-label="Total R$" id="totalSeguroR"></td>
+</tr>
       <tr class="bold">
         <td class="left">VALOR TOTAL ADUANEIRO (R$)</td>
         <td colspan="4" id="va"></td>
 
       </tr>
-      <tr>
-        <td class="left">Acrescimos (capatazia) (R$)</td>
-        <td colspan="4"><input id="capatazia" class="taxa" value="8,82" aria-label="Acrescimos capatazia" /></td>
-      </tr>
+<tr>
+  <td class="left">Acrescimos (capatazia) (R$)</td>
+  <td colspan="4" data-label="Acrescimos (capatazia) (R$)">
+    <input id="capatazia" class="taxa" value="8,82" aria-label="Acrescimos capatazia" />
+  </td>
+</tr>
       <tr class="bold">
         <td class="left">VALOR TOTAL CIF (R$)</td>
         <td colspan="4" id="cif"></td>
@@ -281,84 +309,84 @@ Informe os dados desejados e percentuais dos impostos, o calculo é automático:
     </tbody>
   </table>
 
-  <h2>ENCARGOS - Tributos e Custos adicionais R$</h2>
+
+  <h3>ENCARGOS ADUANEIROS (R$)</h3>
   <table>
     <thead>
       <tr>
-        <th class="left">Imposto</th>
+        <th class="left">Imposto e custos</th>
         <th>Base</th>
         <th>Taxa (%)</th>
         <th>Total R$</th>
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td class="left">Imposto de Importação (II)</td>
-        <td id="baseII"></td>
-        <td><input id="taxaII" class="taxa" value="14,40" aria-label="Taxa Imposto de Importação" /></td>
-        <td id="totalII"></td>
-      </tr>
-      <tr>
-        <td class="left">IPI</td>
-        <td id="baseIPI"></td>
-        <td><input id="taxaIPI" class="taxa" value="9,75" aria-label="Taxa IPI" /></td>
-        <td id="totalIPI"></td>
-      </tr>
-      <tr>
-        <td class="left">PIS</td>
-        <td id="basePIS"></td>
-        <td><input id="taxaPIS" class="taxa" value="2,10" aria-label="Taxa PIS" /></td>
-        <td id="totalPIS"></td>
-      </tr>
-      <tr>
-        <td class="left">COFINS</td>
-        <td id="baseCOFINS"></td>
-        <td><input id="taxaCOFINS" class="taxa" value="9,65" aria-label="Taxa COFINS" /></td>
-        <td id="totalCOFINS"></td>
-      </tr>
-      <tr>
-        <td class="left">Imposto Seletivo (IS):</td>
-        <td id="baseIS1"></td>
-        <td><input id="taxaIS1" class="taxa" value="0,00" readonly aria-label="Taxa Imposto Seletivo 1" /></td>
-        <td id="totalIS1"></td>
-      </tr>
+<tr>
+  <td class="left">Imposto de Importação (II)</td>
+  <td data-label="Base" id="baseII"></td>
+  <td data-label="Taxa (%)"><input id="taxaII" class="taxa" value="14,40" aria-label="Taxa Imposto de Importação" /></td>
+  <td data-label="Total R$" id="totalII"></td>
+</tr>
+<tr>
+  <td class="left">IPI</td>
+  <td data-label="Base" id="baseIPI"></td>
+  <td data-label="Taxa (%)"><input id="taxaIPI" class="taxa" value="9,75" aria-label="Taxa IPI" /></td>
+  <td data-label="Total R$" id="totalIPI"></td>
+</tr>
+<tr>
+  <td class="left">PIS</td>
+  <td data-label="Base" id="basePIS"></td>
+  <td data-label="Taxa (%)"><input id="taxaPIS" class="taxa" value="2,10" aria-label="Taxa PIS" /></td>
+  <td data-label="Total R$" id="totalPIS"></td>
+</tr>
+<tr>
+  <td class="left">COFINS</td>
+  <td data-label="Base" id="baseCOFINS"></td>
+  <td data-label="Taxa (%)"><input id="taxaCOFINS" class="taxa" value="9,65" aria-label="Taxa COFINS" /></td>
+  <td data-label="Total R$" id="totalCOFINS"></td>
+</tr>
+<tr>
+  <td class="left">Imposto Seletivo (IS):</td>
+  <td data-label="Base" id="baseIS1"></td>
+  <td data-label="Taxa (%)"><input id="taxaIS1" class="taxa" value="0,00" readonly aria-label="Taxa Imposto Seletivo 1" /></td>
+  <td data-label="Total R$" id="totalIS1"></td>
+</tr>
 
 <tr>
   <td class="left">Taxa Siscomex:</td>
   <td colspan="2"></td>
-  <td><input id="totalSiscomex" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Taxa Siscomex" /></td>
+  <td data-label="Total R$"><input id="totalSiscomex" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Taxa Siscomex" /></td>
 </tr>
 <tr>
   <td class="left">AFRMM:</td>
   <td colspan="2"></td>
-  <td><input id="totalAFRMM" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total AFRMM" /></td>
+  <td data-label="Total R$"><input id="totalAFRMM" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total AFRMM" /></td>
 </tr>
 <tr>
   <td class="left">CIDE-Combustíveis:</td>
   <td colspan="2"></td>
-  <td><input id="totalCIDE" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total CIDE-Combustíveis" /></td>
+  <td data-label="Total R$"><input id="totalCIDE" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total CIDE-Combustíveis" /></td>
 </tr>
 <tr>
   <td class="left">Antidumping:</td>
   <td colspan="2"></td>
-  <td><input id="totalAntidumping" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Antidumping" /></td>
+  <td data-label="Total R$"><input id="totalAntidumping" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Antidumping" /></td>
 </tr>
 <tr>
   <td class="left">Compensatórios:</td>
   <td colspan="2"></td>
-  <td><input id="totalCompensatorios" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Compensatórios" /></td>
+  <td data-label="Total R$"><input id="totalCompensatorios" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Compensatórios" /></td>
 </tr>
 <tr>
   <td class="left">Salvaguardas:</td>
   <td colspan="2"></td>
-  <td><input id="totalSalvaguardas" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Salvaguardas" /></td>
+  <td data-label="Total R$"><input id="totalSalvaguardas" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Salvaguardas" /></td>
 </tr>
 <tr>
   <td class="left">Outros tributos:</td>
   <td colspan="2"></td>
-  <td><input id="totalOutros" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Outros Tributos" /></td>
-</tr>
-	
+  <td data-label="Total R$"><input id="totalOutros" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Outros Tributos" /></td>
+</tr>	
 
       <tr class="bold">
         <td class="left">TOTAL CIF + ENCARGOS (R$)</td>
@@ -366,13 +394,14 @@ Informe os dados desejados e percentuais dos impostos, o calculo é automático:
       </tr>
      
     </tbody>
+
   </table>
 
-  <h2>Base de cálculo do ICMS</h2>
+  <h3>BASE DE CÁLCULO DO ICMS</h3>
   <table>
     <thead>
       <tr>
-        <th class="left">IMPOSTO</th>
+        <th class="left">Impostos</th>
         <th>Base</th>
         <th>Taxa (%)</th>
         <th>Fator</th>
@@ -380,17 +409,17 @@ Informe os dados desejados e percentuais dos impostos, o calculo é automático:
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td class="left">ICMS</td>
-        <td id="baseICMS"></td>
-        <td><input id="taxaICMS" class="taxa" value="18,00" aria-label="Taxa ICMS" /></td>
-        <td id="fatorICMS"></td>
-        <td id="totalICMS"></td>
-      </tr>
+     <tr>
+  <td class="left">ICMS</td>
+  <td data-label="Base" id="baseICMS"></td>
+  <td data-label="Taxa (%)"><input id="taxaICMS" class="taxa" value="18,00" aria-label="Taxa ICMS" /></td>
+  <td data-label="Fator" id="fatorICMS"></td>
+  <td data-label="Total ICMS" id="totalICMS"></td>
+</tr>
     </tbody>
   </table>
 
-  <h2>Base de Cálculo do IBS/CBS/IS</h2>
+  <h3>BASE DE CÁLCULO DO IBS/CBS/IS</h3>
   <table>
     <thead>
       <tr>
@@ -401,30 +430,31 @@ Informe os dados desejados e percentuais dos impostos, o calculo é automático:
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td class="left">IBS Municial</td>
-        <td id="baseIBSM"></td>
-        <td><input id="taxaIBSM" class="taxa" value="0,00" aria-label="Taxa IBS Municipal" /></td>
-        <td id="totalIBSM"></td>
-      </tr>
-      <tr>
-        <td class="left">IBS Estadual</td>
-        <td id="baseIBSE"></td>
-        <td><input id="taxaIBSE" class="taxa" value="0,10" aria-label="Taxa IBS Estadual" /></td>
-        <td id="totalIBSE"></td>
-      </tr>
-      <tr>
-        <td class="left">CBS</td>
-        <td id="baseCBS"></td>
-        <td><input id="taxaCBS" class="taxa" value="0,90" aria-label="Taxa CBS" /></td>
-        <td id="totalCBS"></td>
-      </tr>
-      <tr>
-        <td class="left">Imposto Seletivo (IS):</td>
-        <td id="baseIS2"></td>
-        <td><input id="taxaIS2" class="taxa" value="0,00" aria-label="Taxa Imposto Seletivo 2" /></td>
-        <td id="totalIS2"></td>
-      </tr>
+   <tr>
+  <td class="left">IBS Municial</td>
+  <td data-label="Base" id="baseIBSM"></td>
+  <td data-label="Taxa (%)"><input id="taxaIBSM" class="taxa" value="0,00" aria-label="Taxa IBS Municipal" /></td>
+  <td data-label="Total R$" id="totalIBSM"></td>
+</tr>
+<tr>
+  <td class="left">IBS Estadual</td>
+  <td data-label="Base" id="baseIBSE"></td>
+  <td data-label="Taxa (%)"><input id="taxaIBSE" class="taxa" value="0,10" aria-label="Taxa IBS Estadual" /></td>
+  <td data-label="Total R$" id="totalIBSE"></td>
+</tr>
+<tr>
+  <td class="left">CBS</td>
+  <td data-label="Base" id="baseCBS"></td>
+  <td data-label="Taxa (%)"><input id="taxaCBS" class="taxa" value="0,90" aria-label="Taxa CBS" /></td>
+  <td data-label="Total R$" id="totalCBS"></td>
+</tr>
+<tr>
+  <td class="left">Imposto Seletivo (IS)</td>
+  <td data-label="Base" id="baseIS2"></td>
+  <td data-label="Taxa (%)"><input id="taxaIS2" class="taxa" value="0,00" aria-label="Taxa Imposto Seletivo 2" /></td>
+  <td data-label="Total R$" id="totalIS2"></td>
+</tr>
+
       <tr class="bold">
         <td class="left">TOTAL DOS IMPOSTOS RT</td>
         <td colspan="3" id="totalRT"></td>
@@ -606,7 +636,19 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
   </script>
 
 
-
+<script src="https://unpkg.com/imask"></script>
+<script>
+  const inputCambio = document.getElementById('cambio');
+  IMask(inputCambio, {
+    mask: Number,
+    scale: 4,
+    signed: false,
+    thousandsSeparator: '',
+    padFractionalZeros: true,
+    normalizeZeros: true,
+    radix: ','
+  });
+</script>
 
 
   <footer class="footer">
@@ -629,7 +671,7 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
     Me siga no LinkedIn – 
     <a href="https://www.linkedin.com/in/diegodangelo-di-ryco/" target="_blank">Diego Dangelo</a>
     <a href="https://www.linkedin.com/in/diegodangelo-di-ryco/" target="_blank" style="text-decoration: none;">
-      <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" width="30" height="30" style="vertical-align: middle;">
+      <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" loading="lazy" alt="LinkedIn" width="30" height="30" style="vertical-align: middle;">
     </a>
 
   </footer>
@@ -650,17 +692,6 @@ function compartilhar() {
     alert('Compartilhamento não suportado neste navegador. Copie o link manualmente:\n\nhttps://odangdi.github.io/simulador-rt2026/');
   }
 }
-</script>
-
-
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
-        .catch(err => console.log('Falha ao registrar Service Worker:', err));
-    });
-  }
 </script>
 
 
