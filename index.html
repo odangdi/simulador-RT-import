@@ -201,9 +201,9 @@
 
   <h1>SIMULADOR IMPORTAÇÃO RT</h1>
 
-Esta ferramenta simula o calculo de impostos na importação com base na DI e atualização da Reforma Tributária, incluindo os novos impostos IBS, CBS e IS.<br>
+Esta ferramenta simula o cálculo de impostos em operações de IMPORTAÇÃO COMERCIAL, já considerando os novos tributos IBS, CBS e IS da Reforma Tributária.<br>
 
-<p>- Informe os dados desejados e percentuais dos impostos, o calculo é automático:</p>
+<p>- Preencha os dados e os percentuais dos impostos desejados. Assim como em uma Declaração de Importação (DI), o cálculo é realizado automaticamente:</p>
 
      <!-- Seção Moeda e Câmbio -->
     <section aria-labelledby="sec-cambio">
@@ -466,21 +466,30 @@ Esta ferramenta simula o calculo de impostos na importação com base na DI e at
 
  <h2>TOTAL</h2>
   <table>
+    <thead>
 
- <tr class="bold" style="background-color: #eaf3fc;">
+<tr>
+      <th class="left">DEMONSTRATIVO DE VALORES</th>
+        <th></th>
+        <th></th>
+        <th></th>
+  </thead>
+        <tr class="bold">
         <td class="left">VALOR TOTAL DO PRODUTO</td>
         <td colspan="3" id="totalprodutos"></td>
       </tr>
 
-      <tr>
-        <tr class="bold" style="background-color: #eaf3fc;">
+        <tr class="bold">
         <td class="left">VALOR TOTAL DA NOTA FISCAL</td>
         <td colspan="3" id="totalNF"></td>
       </tr>  
 
 
     </tbody>
+
   </table>
+
+
 
   <script>
     // Função para arredondar com 2 casas decimais
