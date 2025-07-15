@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4CAF50">
+  <link rel="icon" href="icon.png">
+  <title>Simulador RT - Importação</title>
+  <style>
+    /* Reset básico e fonte */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fafafa;
+      margin: 0 auto;
+      padding: 10px;
+      max-width: 960px;
+      font-size: 13px;
+      color: #333;
+      line-height: 1.4;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      font-size: 2rem;
+    }
+
+    h2 {
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+      color: #34495e;
+      border-bottom: 2px solid #2980b9;
+      padding-bottom: 0.25rem;
+    }
+
+    /* Tabela estilizada */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.8rem;
+      background: #fff;
+      box-shadow: 0 2px 5px rgb(0 0 0 / 0.05);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    thead tr {
+      background: #2980b9;
+      color: #fff;
+      font-weight: 600;
+      text-align: center;
+      user-select: none;
+    }
+
+    td, th {
+      padding: 3px 4px;
+      border-bottom: 1px solid #ddd;
+      vertical-align: middle;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th.left, td.left {
+      text-align: left;
+    }
+
+    /* Última linha sem borda inferior */
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Inputs */
+    input[type="number"], input[type="text"], select {
+      width: 100%;
+      padding: 6px 10px;
+      border: 1.5px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.2s ease-in-out;
+      text-align: right;
+      box-sizing: border-box;
+    }
+    input.taxa {
+      text-align: right;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #2980b9;
+      box-shadow: 0 0 4px rgba(41, 128, 185, 0.4);
+    }
+
+    /* Campos somente leitura com estilo */
+    input[readonly] {
+      background-color: #f3f3f3;
+      color: #666;
+      cursor: not-allowed;
+      text-align: center;
+    }
+
+    /* Linhas em destaque */
+    tr.bold {
+      font-weight: 700;
+      background-color: #eaf3fc;
+    }
+    tr.bold.highlight {
+      background-color: #fde5d9;
+    }
+
+    /* Alinhamento e margens no select */
+    #moeda {
+      max-width: 220px;
+      margin-left: 0;
+      display: block;
+      text-align: left;
+    }
+
+    /* Responsividade simples */
+    @media (max-width: 700px) {
+      body {
+        padding: 10px;
+        font-size: 13px;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+      }
+      thead tr {
+        display: none;
+      }
+      tr {
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgb(0 0 0 / 0.1);
+        background: white;
+        padding: 10px;
+      }
+      td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+        border: none;
+        border-bottom: 1px solid #eee;
+      }
+      td.left {
+        text-align: left;
+      }
+      td::before {
+        position: absolute;
+        left: 10px;
+        width: 45%;
+        white-space: nowrap;
+        font-weight: 600;
+        text-align: left;
+        color: #666;
+      }
+      /* Labels dos dados - você pode personalizar para cada tabela via JS ou manual */
+      table:nth-of-type(1) td:nth-of-type(1)::before { content: "Item"; }
+      table:nth-of-type(1) td:nth-of-type(2)::before { content: "Dados do produto"; }
+      table:nth-of-type(1) td:nth-of-type(3)::before { content: "Total"; }
+      table:nth-of-type(1) td:nth-of-type(4)::before { content: "Vl R$"; }
+      table:nth-of-type(1) td:nth-of-type(5)::before { content: "Total R$"; }
+    }
+
+    .moeda-cambio-cell {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    #moeda, #cambio {
+      width: 150px;
+      text-align: left;
+    }
+	
+  </style>
+</head>
+<body>
+
+
+  <h1>Simulador Importação - REFORMA TRIBUTÁRIA</h1>
+
+  <table>
+    <tbody>
+      <tr>
+        <th class="left">Moeda e Câmbio:</th>
+        <td class="moeda-cambio-cell">
+          <select id="moeda" aria-label="Selecione a moeda">
+            <option value="USD-BRL" selected>Dólar (USD)</option>
+            <option value="EUR-BRL">Euro (EUR)</option>
+            <option value="GBP-BRL">Libra Esterlina (GBP)</option>
+            <option value="ARS-BRL">Peso Argentino (ARS)</option>
+            <option value="JPY-BRL">Iene Japonês (JPY)</option>
+            <option value="AUD-BRL">Dólar Australiano (AUD)</option>
+            <option value="CAD-BRL">Dólar Canadense (CAD)</option>
+            <option value="CHF-BRL">Franco Suíço (CHF)</option>
+            <option value="CNY-BRL">Yuan Chinês (CNY)</option>
+            <option value="NZD-BRL">Dólar Neozelandês (NZD)</option>
+            <option value="MXN-BRL">Peso Mexicano (MXN)</option>
+            <option value="KRW-BRL">Won Sul-Coreano (KRW)</option>
+            <option value="INR-BRL">Rupia Indiana (INR)</option>
+            <option value="ZAR-BRL">Rand Sul-Africano (ZAR)</option>
+          </select>
+          <input type="text" id="cambio" value="5,8808" aria-label="Taxa de câmbio" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>COMPOSIÇÃO</h2>
+  <table>
+    <thead>
+      <tr>
+        <th class="left">ITEM</th>
+        <th>Dados do produto</th>
+        <th>Total</th>
+        <th>Vl R$</th>
+        <th>Total R$</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="left">Quantidade:</td>
+        <td><input id="quantidade" class="taxa" value="10,000" min="0,001" step="any" aria-label="Quantidade" /></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td class="left">VL produto moeda estrangeira-FOB ($)</td>
+        <td><input id="fob" class="taxa" value="27,758" aria-label="Valor FOB em moeda estrangeira" /></td>
+        <td id="totalFOB"></td>
+        <td id="vlFOB"></td>
+        <td id="totalFOBR"></td>
+      </tr>
+      <tr>
+        <td class="left">Frete internacional ($)</td>
+        <td><input id="frete" class="taxa" value="1,02" aria-label="Frete internacional" /></td>
+        <td></td>
+        <td id="vlFrete"></td>
+        <td id="totalFreteR"></td>
+      </tr>
+      <tr>
+        <td class="left">Seguro internacional ($)</td>
+        <td><input id="seguro" class="taxa" value="0,00" aria-label="Seguro internacional" /></td>
+        <td></td>
+        <td id="vlSeguro"></td>
+        <td id="totalSeguroR"></td>
+      </tr>
+      <tr class="bold">
+        <td class="left">VALOR TOTAL ADUANEIRO (R$)</td>
+        <td colspan="4" id="va"></td>
+
+      </tr>
+      <tr>
+        <td class="left">Acrescimos (capatazia) (R$)</td>
+        <td colspan="4"><input id="capatazia" class="taxa" value="8,82" aria-label="Acrescimos capatazia" /></td>
+      </tr>
+      <tr class="bold">
+        <td class="left">VALOR TOTAL CIF EM REAIS (R$)</td>
+        <td colspan="4" id="cif"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>ENCARGOS - Tributos e Custos adicionais R$</h2>
+  <table>
+    <thead>
+      <tr>
+        <th class="left">Imposto</th>
+        <th>Base</th>
+        <th>Taxa (%)</th>
+        <th>Total R$</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="left">Imposto de Importação (II)</td>
+        <td id="baseII"></td>
+        <td><input id="taxaII" class="taxa" value="14,40" aria-label="Taxa Imposto de Importação" /></td>
+        <td id="totalII"></td>
+      </tr>
+      <tr>
+        <td class="left">IPI</td>
+        <td id="baseIPI"></td>
+        <td><input id="taxaIPI" class="taxa" value="9,75" aria-label="Taxa IPI" /></td>
+        <td id="totalIPI"></td>
+      </tr>
+      <tr>
+        <td class="left">PIS</td>
+        <td id="basePIS"></td>
+        <td><input id="taxaPIS" class="taxa" value="2,10" aria-label="Taxa PIS" /></td>
+        <td id="totalPIS"></td>
+      </tr>
+      <tr>
+        <td class="left">COFINS</td>
+        <td id="baseCOFINS"></td>
+        <td><input id="taxaCOFINS" class="taxa" value="9,65" aria-label="Taxa COFINS" /></td>
+        <td id="totalCOFINS"></td>
+      </tr>
+      <tr>
+        <td class="left">Imposto Seletivo (IS):</td>
+        <td id="baseIS1"></td>
+        <td><input id="taxaIS1" class="taxa" value="0,00" readonly aria-label="Taxa Imposto Seletivo 1" /></td>
+        <td id="totalIS1"></td>
+      </tr>
+
+<tr>
+  <td class="left">Taxa Siscomex:</td>
+  <td colspan="2"></td>
+  <td><input id="totalSiscomex" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Taxa Siscomex" /></td>
+</tr>
+<tr>
+  <td class="left">AFRMM:</td>
+  <td colspan="2"></td>
+  <td><input id="totalAFRMM" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total AFRMM" /></td>
+</tr>
+<tr>
+  <td class="left">CIDE-Combustíveis:</td>
+  <td colspan="2"></td>
+  <td><input id="totalCIDE" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total CIDE-Combustíveis" /></td>
+</tr>
+<tr>
+  <td class="left">Antidumping:</td>
+  <td colspan="2"></td>
+  <td><input id="totalAntidumping" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Antidumping" /></td>
+</tr>
+<tr>
+  <td class="left">Compensatórios:</td>
+  <td colspan="2"></td>
+  <td><input id="totalCompensatorios" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Compensatórios" /></td>
+</tr>
+<tr>
+  <td class="left">Salvaguardas:</td>
+  <td colspan="2"></td>
+  <td><input id="totalSalvaguardas" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Salvaguardas" /></td>
+</tr>
+<tr>
+  <td class="left">Outros tributos:</td>
+  <td colspan="2"></td>
+  <td><input id="totalOutros" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Outros Tributos" /></td>
+</tr>
+	
+
+      <tr class="bold">
+        <td class="left">TOTAL CIF + ENCARGOS</td>
+        <td colspan="3" id="totalEncargos"></td>
+      </tr>
+     
+    </tbody>
+  </table>
+
+  <h2>Base de cálculo do ICMS</h2>
+  <table>
+    <thead>
+      <tr>
+        <th class="left">IMPOSTO</th>
+        <th>Base</th>
+        <th>Taxa (%)</th>
+        <th>Fator</th>
+        <th>Total ICMS</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="left">ICMS</td>
+        <td id="baseICMS"></td>
+        <td><input id="taxaICMS" class="taxa" value="18,00" aria-label="Taxa ICMS" /></td>
+        <td id="fatorICMS"></td>
+        <td id="totalICMS"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Base de Cálculo do IBS/CBS/IS</h2>
+  <table>
+    <thead>
+      <tr>
+        <th class="left">Imposto Reforma Tributária</th>
+        <th>Base</th>
+        <th>Taxa (%)</th>
+        <th>Total R$</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="left">IBS Municial</td>
+        <td id="baseIBSM"></td>
+        <td><input id="taxaIBSM" class="taxa" value="0,00" aria-label="Taxa IBS Municipal" /></td>
+        <td id="totalIBSM"></td>
+      </tr>
+      <tr>
+        <td class="left">IBS Estadual</td>
+        <td id="baseIBSE"></td>
+        <td><input id="taxaIBSE" class="taxa" value="0,10" aria-label="Taxa IBS Estadual" /></td>
+        <td id="totalIBSE"></td>
+      </tr>
+      <tr>
+        <td class="left">CBS</td>
+        <td id="baseCBS"></td>
+        <td><input id="taxaCBS" class="taxa" value="0,90" aria-label="Taxa CBS" /></td>
+        <td id="totalCBS"></td>
+      </tr>
+      <tr>
+        <td class="left">Imposto Seletivo (IS):</td>
+        <td id="baseIS2"></td>
+        <td><input id="taxaIS2" class="taxa" value="0,00" aria-label="Taxa Imposto Seletivo 2" /></td>
+        <td id="totalIS2"></td>
+      </tr>
+      <tr class="bold">
+        <td class="left">TOTAL DOS IMPOSTOS RT</td>
+        <td colspan="3" id="totalRT"></td>
+      </tr>
+     
+    </tbody>
+  </table>
+
+
+ <h2>TOTAL</h2>
+  <table>
+
+ <tr class="bold" style="background-color: #eaf3fc;">
+        <td class="left">VALOR TOTAL DO PRODUTO</td>
+        <td colspan="3" id="totalprodutos"></td>
+      </tr>
+
+      <tr>
+        <tr class="bold" style="background-color: #eaf3fc;">
+        <td class="left">VALOR TOTAL DA NOTA FISCAL</td>
+        <td colspan="3" id="totalNF"></td>
+      </tr>  
+
+
+    </tbody>
+  </table>
+
+  <script>
+    // Função para arredondar com 2 casas decimais
+    const arred = val => +(val.toFixed(2));
+
+    function calcular() {
+      const qtd = parseFloat(document.getElementById('quantidade').value.replace(',', '.')) || 0;
+      const cambio = parseFloat(document.getElementById('cambio').value.replace(',', '.')) || 0;
+      const fob = parseFloat(document.getElementById('fob').value.replace(',', '.')) || 0;
+      const frete = parseFloat(document.getElementById('frete').value.replace(',', '.')) || 0;
+      const seguro = parseFloat(document.getElementById('seguro').value.replace(',', '.')) || 0;
+      const capatazia = parseFloat(document.getElementById('capatazia').value.replace(',', '.')) || 0;
+
+      const totalFOB = arred(fob * qtd);
+      const totalFOBR = arred(totalFOB * cambio);
+      const freteR = arred(frete * cambio);
+      const seguroR = arred(seguro * cambio);
+      const va = arred(totalFOBR + freteR + seguroR);
+      const cif = arred(va + capatazia);
+
+      const taxaII = (parseFloat(document.getElementById('taxaII').value.replace(',', '.')) || 0) / 100;
+      const taxaIPI = (parseFloat(document.getElementById('taxaIPI').value.replace(',', '.')) || 0) / 100;
+      const taxaPIS = (parseFloat(document.getElementById('taxaPIS').value.replace(',', '.')) || 0) / 100;
+      const taxaCOFINS = (parseFloat(document.getElementById('taxaCOFINS').value.replace(',', '.')) || 0) / 100;
+      const taxaIS2 = (parseFloat(document.getElementById('taxaIS2').value.replace(',', '.')) || 0) / 100;
+
+const siscomex = parseFloat(document.getElementById('totalSiscomex')?.value.replace(',', '.') || 0);
+const afrmm = parseFloat(document.getElementById('totalAFRMM')?.value.replace(',', '.') || 0);
+const cide = parseFloat(document.getElementById('totalCIDE')?.value.replace(',', '.') || 0);
+const antidumping = parseFloat(document.getElementById('totalAntidumping')?.value.replace(',', '.') || 0);
+const compensatorios = parseFloat(document.getElementById('totalCompensatorios')?.value.replace(',', '.') || 0);
+const salvaguardas = parseFloat(document.getElementById('totalSalvaguardas')?.value.replace(',', '.') || 0);
+const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(',', '.') || 0);
+
+
+  
+
+
+      // Sincroniza taxaIS1 com taxaIS2
+      document.getElementById('taxaIS1').value = (taxaIS2 * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      const taxaIS1 = taxaIS2;
+
+      const taxaICMS = (parseFloat(document.getElementById('taxaICMS').value.replace(',', '.')) || 0) / 100;
+      const taxaIBSM = (parseFloat(document.getElementById('taxaIBSM').value.replace(',', '.')) || 0) / 100;
+      const taxaIBSE = (parseFloat(document.getElementById('taxaIBSE').value.replace(',', '.')) || 0) / 100;
+      const taxaCBS = (parseFloat(document.getElementById('taxaCBS').value.replace(',', '.')) || 0) / 100;
+
+      const totalII = arred(cif * taxaII);
+      const totalIPI = arred((cif + totalII) * taxaIPI);
+      const totalPIS = arred(cif * taxaPIS);
+      const totalCOFINS = arred(cif * taxaCOFINS);
+      const totalIS1 = arred(cif * taxaIS1);
+
+      const totalEncargos = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalIS1 + siscomex + afrmm + cide + antidumping + compensatorios + salvaguardas + outros);
+      const totalprodutos = arred(totalEncargos - totalIS1);
+
+      const fatorICMS = +(1 - taxaICMS).toFixed(4);
+      const baseICMS = fatorICMS !== 0 ? arred(totalprodutos / fatorICMS) : 0;
+      const totalICMS = arred(baseICMS * taxaICMS);
+
+      const totalIBSM = arred(totalEncargos * taxaIBSM);
+      const totalIBSE = arred(totalEncargos * taxaIBSE);
+      const totalCBS = arred(totalEncargos * taxaCBS);
+      const totalIS2 = arred(cif * taxaIS2);
+
+      const totalNF = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalICMS + totalIBSM + totalIBSE + totalCBS + totalIS2);
+
+      // Atualiza DOM
+      document.getElementById('totalFOB').textContent = totalFOB.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('vlFOB').textContent = arred(fob * cambio).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalFOBR').textContent = totalFOBR.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('vlFrete').textContent = freteR.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalFreteR').textContent = freteR.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('vlSeguro').textContent = seguroR.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalSeguroR').textContent = seguroR.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('va').textContent = va.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('cif').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('baseII').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIPI').textContent = (cif + totalII).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('basePIS').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseCOFINS').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIS1').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('totalII').textContent = totalII.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalIPI').textContent = totalIPI.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalPIS').textContent = totalPIS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalCOFINS').textContent = totalCOFINS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalIS1').textContent = totalIS1.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('totalEncargos').textContent = totalEncargos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalprodutos').textContent = totalprodutos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('baseICMS').textContent = baseICMS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('fatorICMS').textContent = fatorICMS.toFixed(4);
+      document.getElementById('totalICMS').textContent = totalICMS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('baseIBSM').textContent = totalEncargos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIBSE').textContent = totalEncargos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseCBS').textContent = totalEncargos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIS2').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('totalIBSM').textContent = totalIBSM.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalIBSE').textContent = totalIBSE.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalCBS').textContent = totalCBS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalIS2').textContent = totalIS2.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('totalRT').textContent = (totalIBSM + totalIBSE + totalCBS + totalIS2).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('totalNF').textContent = totalNF.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    }
+
+    // Evento para recalcular sempre que mudar algum input
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calcular);
+    });
+
+    calcular();
+
+    // Controle de atualização manual do câmbio
+    let cambioManual = false;
+    const campoCambio = document.getElementById('cambio');
+    const selectMoeda = document.getElementById('moeda');
+
+    async function atualizarCambio() {
+      if (cambioManual) return;
+      const moeda = selectMoeda.value;
+      try {
+        const resposta = await fetch(`https://economia.awesomeapi.com.br/json/last/${moeda}`);
+        const dados = await resposta.json();
+        const parMoeda = moeda.replace('-', '');
+        const bid = parseFloat(dados[parMoeda].bid.replace(',', '.')).toFixed(4);
+        campoCambio.value = bid.replace('.', ','); // Mantém vírgula para padrão BR
+        calcular();
+      } catch (erro) {
+        console.error("Erro ao buscar câmbio:", erro);
+      }
+    }
+
+    selectMoeda.addEventListener('change', () => {
+      cambioManual = false;
+      atualizarCambio();
+    });
+
+    campoCambio.addEventListener('input', () => {
+      cambioManual = true;
+      calcular();
+    });
+
+    window.addEventListener('load', atualizarCambio);
+  </script>
+
+
+
+
+
+  <footer class="footer">
+
+    <a href="https://forms.gle/FgHaFehB74mNmxH98" target="_blank">De seu feedback, avalie este conteúdo &#10004</a><p>
+    <h3><strong>e-book's &#128217 de estudos Fiscais na Amazon:</strong></h3>
+    <a href="https://www.amazon.com.br/dp/B0FB4BDH8V" target="_blank">■ CRÉDITOS DE IBS e CBS: uso e consumo pessoal</a><br>
+    <a href="https://www.amazon.com.br/dp/B0DHGB27K2" target="_blank">■ EXCLUSÃO ICMS DA BASE PIS E COFINS: formação do preço de venda</a><br>
+ </footer>
+
+
+
+
+<br>
+<footer class="footer">
+
+    Simulador desenvolvido com base na Lei Complementar nº 214, de 16/01/2025 e legislação anterior.<br>
+    &copy; 2025 Diego D'angelo. Licenciado sob 
+    <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a><br><br>
+    Me siga no LinkedIn – 
+    <a href="https://www.linkedin.com/in/diegodangelo-di-ryco/" target="_blank">Diego Dangelo</a>
+    <a href="https://www.linkedin.com/in/diegodangelo-di-ryco/" target="_blank" style="text-decoration: none;">
+      <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" width="30" height="30" style="vertical-align: middle;">
+    </a>
+
+  </footer>
+
+<button onclick="compartilhar()">🔗 Compartilhar esta página</button>
+
+<script>
+function compartilhar() {
+  if (navigator.share) {
+    navigator.share({
+      title: 'Simulador RT 2026',
+      text: 'Confira este simulador de impostos baseado na Reforma Tributária!',
+      url: 'https://odangdi.github.io/simulador-rt2026/',
+    })
+    .then(() => console.log('Compartilhado com sucesso'))
+    .catch((error) => console.log('Erro ao compartilhar:', error));
+  } else {
+    alert('Compartilhamento não suportado neste navegador. Copie o link manualmente:\n\nhttps://odangdi.github.io/simulador-rt2026/');
+  }
+}
+</script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
+        .catch(err => console.log('Falha ao registrar Service Worker:', err));
+    });
+  }
+</script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
+        .catch(err => console.log('Falha ao registrar Service Worker:', err));
+    });
+  }
+</script>
+
+
+
+
+</body>
+</html>

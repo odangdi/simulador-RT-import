@@ -1,0 +1,12 @@
+{
+  "USDBRL": {
+    "code": "USD",
+    "codein": "BRL",
+    "name": "Dólar Americano/Real Brasileiro",
+    "high": "5.8910",
+    "low": "5.8500",
+    "bid": "5.8808",  // 💰 Aqui é o valor que você usaria
+    "ask": "5.8813",
+    ...
+  }
+}
