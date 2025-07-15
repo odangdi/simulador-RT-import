@@ -127,9 +127,11 @@
 
     /* Responsividade simples */
     @media (max-width: 700px) {
-      body {
-        padding: 10px;
-        font-size: 12px;
+  input[type="number"],
+  input[type="text"],
+  select {
+    font-size: 0.9rem;
+    padding: 8px;
       }
       h1 {
         font-size: 1.5rem;
@@ -149,24 +151,24 @@
         padding: 10px;
       }
       td {
-        text-align: right;
-        padding-left: 50%;
-        position: relative;
-        border: none;
-        border-bottom: 1px solid #eee;
-      }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+  text-align: left;
+}
       td.left {
         text-align: left;
       }
-      td::before {
-        position: absolute;
-        left: 10px;
-        width: 45%;
-        white-space: nowrap;
-        font-weight: 600;
-        text-align: left;
-        color: #666;
-      }
+td::before {
+  content: attr(data-label);
+  font-weight: bold;
+  flex: 1;
+  text-align: left;
+  margin-right: 10px;
+  min-width: 120px;
+}
       /* Labels dos dados - você pode personalizar para cada tabela via JS ou manual */
       table:nth-of-type(1) td:nth-of-type(1)::before { content: "Item"; }
       table:nth-of-type(1) td:nth-of-type(2)::before { content: "Dados do produto"; }
