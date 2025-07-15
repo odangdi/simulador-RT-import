@@ -8,7 +8,6 @@
   <link rel="icon" href="icon.png">
   <title>Simulador RT - Importação</title>
   <style>
-    /* Reset básico e fonte */
     * {
       box-sizing: border-box;
     }
@@ -18,7 +17,7 @@
       margin: 0 auto;
       padding: 10px;
       max-width: 650px;
-      font-size: 12px;
+      font-size: clamp(12px, 2vw, 16px);
       color: #333;
       line-height: 1.4;
     }
@@ -28,7 +27,7 @@
       color: #2c3e50;
       margin-bottom: 1.5rem;
       font-weight: 700;
-      font-size: 2rem;
+      font-size: clamp(1.5rem, 5vw, 2rem);
     }
 
     h2 {
@@ -40,7 +39,6 @@
       padding-bottom: 0.25rem;
     }
 
-    /* Tabela estilizada */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -48,7 +46,8 @@
       background: #fff;
       box-shadow: 0 2px 5px rgb(0 0 0 / 0.05);
       border-radius: 6px;
-      overflow: hidden;
+      overflow-x: auto;
+      display: block;
     }
 
     thead tr {
@@ -71,12 +70,10 @@
       text-align: left;
     }
 
-    /* Última linha sem borda inferior */
     tbody tr:last-child td {
       border-bottom: none;
     }
 
-    /* Inputs */
     input[type="number"], input[type="text"], select {
       width: 100%;
       padding: 6px 10px;
@@ -88,6 +85,7 @@
       text-align: right;
       box-sizing: border-box;
     }
+
     input.taxa {
       text-align: right;
     }
@@ -100,7 +98,6 @@
       box-shadow: 0 0 4px rgba(41, 128, 185, 0.4);
     }
 
-    /* Campos somente leitura com estilo */
     input[readonly] {
       background-color: #f3f3f3;
       color: #666;
@@ -108,16 +105,15 @@
       text-align: center;
     }
 
-    /* Linhas em destaque */
     tr.bold {
       font-weight: 700;
       background-color: #eaf3fc;
     }
+
     tr.bold.highlight {
       background-color: #fde5d9;
     }
 
-    /* Alinhamento e margens no select */
     #moeda {
       max-width: 220px;
       margin-left: 0;
@@ -125,24 +121,45 @@
       text-align: left;
     }
 
-    /* Responsividade simples */
+    .moeda-cambio-cell {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+
+    #moeda, #cambio {
+      width: 100%;
+      max-width: 150px;
+      text-align: left;
+    }
+
     @media (max-width: 700px) {
-  input[type="number"],
-  input[type="text"],
-  select {
-    font-size: 0.9rem;
-    padding: 8px;
+      body {
+        padding: 10px;
       }
+
+      input[type="number"],
+      input[type="text"],
+      select {
+        font-size: 0.9rem;
+        padding: 8px;
+      }
+
       h1 {
         font-size: 1.5rem;
       }
+
       table, thead, tbody, th, td, tr {
         display: block;
-        width: 100%;
+        width: 120%;
       }
+
       thead tr {
         display: none;
       }
+
       tr {
         margin-bottom: 1rem;
         border-radius: 8px;
@@ -150,42 +167,40 @@
         background: white;
         padding: 10px;
       }
+
       td {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-left: 10px;
-  padding-right: 10px;
-  text-align: left;
-}
-      td.left {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 10px;
+        border: none;
+        border-bottom: 1px solid #eee;
         text-align: left;
       }
-td::before {
-  content: attr(data-label);
-  font-weight: bold;
-  flex: 1;
-  text-align: left;
-  margin-right: 10px;
-  min-width: 120px;
-}
-      /* Labels dos dados - você pode personalizar para cada tabela via JS ou manual */
-      table:nth-of-type(1) td:nth-of-type(1)::before { content: "Item"; }
-      table:nth-of-type(1) td:nth-of-type(2)::before { content: "Dados do produto"; }
-      table:nth-of-type(1) td:nth-of-type(3)::before { content: "Total"; }
-      table:nth-of-type(1) td:nth-of-type(4)::before { content: "Vl R$"; }
-      table:nth-of-type(1) td:nth-of-type(5)::before { content: "Total R$"; }
-    }
 
-    .moeda-cambio-cell {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: flex-start;
-    }
-    #moeda, #cambio {
-      width: 150px;
-      text-align: left;
+      td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        flex: 1;
+        text-align: left;
+        margin-right: 30px;
+        min-width: 120px;
+        color: #666;
+      }
+      table {
+        background: #2b2b2b;
+      }
+
+      input, select {
+        background: #333;
+        color: #eee;
+        border-color: #555;
+      }
+
+      input[readonly] {
+        background-color: ;
+        color: #aaa;
+      }
     }
 	
   </style>
@@ -247,7 +262,7 @@ Informe os dados desejados e percentuais dos impostos, o calculo é automático:
         <td></td>
       </tr>
       <tr>
-        <td class="left">VL produto moeda estrangeira-FOB ($)</td>
+        <td class="left">Vl Produto FOB ($)</td>
         <td><input id="fob" class="taxa" value="27,758" aria-label="Valor FOB em moeda estrangeira" /></td>
         <td id="totalFOB"></td>
         <td id="vlFOB"></td>
@@ -277,7 +292,7 @@ Informe os dados desejados e percentuais dos impostos, o calculo é automático:
         <td colspan="4"><input id="capatazia" class="taxa" value="8,82" aria-label="Acrescimos capatazia" /></td>
       </tr>
       <tr class="bold">
-        <td class="left">VALOR TOTAL CIF EM REAIS (R$)</td>
+        <td class="left">VALOR TOTAL CIF (R$)</td>
         <td colspan="4" id="cif"></td>
       </tr>
     </tbody>
@@ -363,7 +378,7 @@ Informe os dados desejados e percentuais dos impostos, o calculo é automático:
 	
 
       <tr class="bold">
-        <td class="left">TOTAL CIF + ENCARGOS</td>
+        <td class="left">TOTAL CIF + ENCARGOS (R$)</td>
         <td colspan="3" id="totalEncargos"></td>
       </tr>
      
