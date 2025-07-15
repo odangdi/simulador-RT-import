@@ -173,8 +173,8 @@
     text-align: left;
   }
       /* Labels dos dados - você pode personalizar para cada tabela via JS ou manual */
-      table:nth-of-type(1) td:nth-of-type(1)::before { content: "Item"; }
-      table:nth-of-type(1) td:nth-of-type(2)::before { content: "Dados do produto"; }
+      table:nth-of-type(1) td:nth-of-type(1)::before { content: " "; }
+      table:nth-of-type(1) td:nth-of-type(2)::before { content: "Dados do produto: "; }
       table:nth-of-type(1) td:nth-of-type(3)::before { content: "Total"; }
       table:nth-of-type(1) td:nth-of-type(4)::before { content: "Vl R$"; }
       table:nth-of-type(1) td:nth-of-type(5)::before { content: "Total R$"; }
@@ -262,14 +262,14 @@ Esta ferramenta simula o calculo de impostos na importação com base na DI e at
     </thead>
     <tbody>
 <tr>
-  <td class="left">Quantidade:</td>
+  <td class="left">Quantidade</td>
   <td data-label="Quantidade">
-    <input id="quantidade" class="taxa" value="10,000" min="0,001" step="any" aria-label="Quantidade" />
+  <input id="quantidade" class="taxa" value="10,000" min="0,001" step="any" aria-label="Quantidade" />
   </td>
 
 <!-- Faça o mesmo para cada <td> que representa um campo de dados visível em telas menores -->
 <tr>
-  <td class="left">Vl Produto FOB ($)</td>
+  <td class="left">Vl Unit. FOB ($)</td>
   <td data-label="Vl Produto FOB ($)"><input id="fob" class="taxa" value="27,758" aria-label="Valor FOB em moeda estrangeira" /></td>
   <td data-label="Total" id="totalFOB"></td>
   <td data-label="Vl R$" id="vlFOB"></td>
