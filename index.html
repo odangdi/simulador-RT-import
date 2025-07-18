@@ -553,9 +553,9 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
       const baseICMS = fatorICMS !== 0 ? arred(totalprodutos / fatorICMS) : 0;
       const totalICMS = arred(baseICMS * taxaICMS);
 
-      const totalIBSM = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS) * taxaIBSM);
-      const totalIBSE = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS) * taxaIBSE);
-      const totalCBS = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS) * taxaCBS);
+      const totalIBSM = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1) * taxaIBSM);
+      const totalIBSE = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1) * taxaIBSE);
+      const totalCBS = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1) * taxaCBS);
       const totalIS2 = arred((cif + totalII) * taxaIS2);
 
       const totalNF = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalICMS + totalIBSM + totalIBSE + totalCBS + totalIS1);
@@ -592,9 +592,9 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
       document.getElementById('fatorICMS').textContent = fatorICMS.toFixed(4);
       document.getElementById('totalICMS').textContent = totalICMS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
-      document.getElementById('baseIBSM').textContent = (totalEncargos - totalIPI - totalPIS - totalCOFINS).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-      document.getElementById('baseIBSE').textContent = (totalEncargos - totalIPI - totalPIS - totalCOFINS).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-      document.getElementById('baseCBS').textContent = (totalEncargos - totalIPI - totalPIS - totalCOFINS).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIBSM').textContent = (totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIBSE').textContent = (totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseCBS').textContent = (totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
       document.getElementById('baseIS2').textContent = (cif + totalII).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
       document.getElementById('totalIBSM').textContent = totalIBSM.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
