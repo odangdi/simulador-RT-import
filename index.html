@@ -349,7 +349,7 @@
   <td data-label="Total R$" id="totalCOFINS"></td>
 </tr>
 <tr>
-  <td class="left">Imposto Seletivo (IS)</td>
+  <td class="left">IS-Imposto Seletivo (ad valorem)</td>
   <td data-label="Base" id="baseIS1"></td>
   <td data-label="Taxa (%)"><input id="taxaIS1" class="taxa" value="0,00" readonly aria-label="Taxa Imposto Seletivo 1" /></td>
   <td data-label="Total R$" id="totalIS1"></td>
@@ -392,7 +392,7 @@
 </tr>	
 
       <tr class="bold">
-        <td class="left">TOTAL CIF + ENCARGOS (R$)</td>
+        <td class="left">TOTAL (R$) = CIF + ENCARGOS - IS </td>
         <td colspan="3" id="totalEncargos"></td>
       </tr>
      
@@ -434,25 +434,25 @@
     </thead>
     <tbody>
    <tr>
-  <td class="left">IBS Municial</td>
+  <td class="left">IBS Municial (Base art. 65 LC 214/25)</td>
   <td data-label="Base" id="baseIBSM"></td>
   <td data-label="Taxa (%)"><input id="taxaIBSM" class="taxa" value="0,00" aria-label="Taxa IBS Municipal" /></td>
   <td data-label="Total R$" id="totalIBSM"></td>
 </tr>
 <tr>
-  <td class="left">IBS Estadual</td>
+  <td class="left">IBS Estadual (Base art. 65 LC 214/25)</td>
   <td data-label="Base" id="baseIBSE"></td>
   <td data-label="Taxa (%)"><input id="taxaIBSE" class="taxa" value="0,10" aria-label="Taxa IBS Estadual" /></td>
   <td data-label="Total R$" id="totalIBSE"></td>
 </tr>
 <tr>
-  <td class="left">CBS</td>
+  <td class="left">CBS (Base art. 65 LC 214/25)</td>
   <td data-label="Base" id="baseCBS"></td>
   <td data-label="Taxa (%)"><input id="taxaCBS" class="taxa" value="0,90" aria-label="Taxa CBS" /></td>
   <td data-label="Total R$" id="totalCBS"></td>
 </tr>
 <tr>
-  <td class="left">Imposto Seletivo (IS)</td>
+  <td class="left">IS-Imposto Seletivo (Base art. 434 LC 214/25)</td>
   <td data-label="Base" id="baseIS2"></td>
   <td data-label="Taxa (%)"><input id="taxaIS2" class="taxa" value="0,00" aria-label="Taxa Imposto Seletivo 2" /></td>
   <td data-label="Total R$" id="totalIS2"></td>
@@ -544,21 +544,21 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
       const totalIPI = arred((cif + totalII) * taxaIPI);
       const totalPIS = arred(cif * taxaPIS);
       const totalCOFINS = arred(cif * taxaCOFINS);
-      const totalIS1 = arred(cif * taxaIS1);
+      const totalIS1 = arred((cif + totalII) * taxaIS1);
 
-      const totalEncargos = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalIS1 + siscomex + afrmm + cide + antidumping + compensatorios + salvaguardas + outros);
-      const totalprodutos = arred(totalEncargos - totalIS1);
+      const totalEncargos = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalIS1 - totalIS1 + siscomex + afrmm + cide + antidumping + compensatorios + salvaguardas + outros);
+      const totalprodutos = arred(totalEncargos - totalIS1 + totalIS1);
 
       const fatorICMS = +(1 - taxaICMS).toFixed(4);
       const baseICMS = fatorICMS !== 0 ? arred(totalprodutos / fatorICMS) : 0;
       const totalICMS = arred(baseICMS * taxaICMS);
 
-      const totalIBSM = arred(totalEncargos * taxaIBSM);
-      const totalIBSE = arred(totalEncargos * taxaIBSE);
-      const totalCBS = arred(totalEncargos * taxaCBS);
-      const totalIS2 = arred(cif * taxaIS2);
+      const totalIBSM = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS) * taxaIBSM);
+      const totalIBSE = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS) * taxaIBSE);
+      const totalCBS = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS) * taxaCBS);
+      const totalIS2 = arred((cif + totalII) * taxaIS2);
 
-      const totalNF = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalICMS + totalIBSM + totalIBSE + totalCBS + totalIS2);
+      const totalNF = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalICMS + totalIBSM + totalIBSE + totalCBS + totalIS1);
 
       // Atualiza DOM
       document.getElementById('totalFOB').textContent = totalFOB.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
@@ -577,7 +577,7 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
       document.getElementById('baseIPI').textContent = (cif + totalII).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
       document.getElementById('basePIS').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
       document.getElementById('baseCOFINS').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-      document.getElementById('baseIS1').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIS1').textContent = (cif + totalII).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
       document.getElementById('totalII').textContent = totalII.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
       document.getElementById('totalIPI').textContent = totalIPI.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
@@ -592,17 +592,17 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
       document.getElementById('fatorICMS').textContent = fatorICMS.toFixed(4);
       document.getElementById('totalICMS').textContent = totalICMS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
-      document.getElementById('baseIBSM').textContent = totalEncargos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-      document.getElementById('baseIBSE').textContent = totalEncargos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-      document.getElementById('baseCBS').textContent = totalEncargos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-      document.getElementById('baseIS2').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIBSM').textContent = (totalEncargos - totalIPI - totalPIS - totalCOFINS).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIBSE').textContent = (totalEncargos - totalIPI - totalPIS - totalCOFINS).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseCBS').textContent = (totalEncargos - totalIPI - totalPIS - totalCOFINS).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIS2').textContent = (cif + totalII).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
       document.getElementById('totalIBSM').textContent = totalIBSM.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
       document.getElementById('totalIBSE').textContent = totalIBSE.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
       document.getElementById('totalCBS').textContent = totalCBS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
       document.getElementById('totalIS2').textContent = totalIS2.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
-      document.getElementById('totalRT').textContent = (totalIBSM + totalIBSE + totalCBS + totalIS2).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalRT').textContent = (totalIBSM + totalIBSE + totalCBS + totalIS1).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
       document.getElementById('totalNF').textContent = totalNF.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     }
