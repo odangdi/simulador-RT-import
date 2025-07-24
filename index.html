@@ -4,272 +4,691 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#6366f1">
+  <meta name="theme-color" content="#2980b9">
   <link rel="icon" href="icon.png">
-  <title>Simulador RT 2026 - Cálculo de Impostos</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#6366f1',
-            secondary: '#000302',
-            accent: "white",
-            success: '#10b981',
-            warning: "white",
-            danger: '#ef4444'
-          },
-          animation: {
-            'fade-in': 'fadeIn 0.5s ease-in-out',
-            'slide-up': 'slideUp 0.3s ease-out',
-            'pulse-soft': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'bounce-soft': 'bounce 1s infinite'
-          }
-        }
-      }
-    }
-  </script>
+  <title>Simulador RT - Importação</title>
   <style>
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* Reset básico e fonte */
+    * {
+      box-sizing: border-box;
     }
-    @keyframes slideUp {
-      from { transform: translateY(10px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fafafa;
+      margin: 0 auto;
+      padding: 10px;
+      max-width: 650px;
+      font-size: 12px;
+      color: #333;
+      line-height: 1.5;
     }
-    .glass-effect {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      font-size: 2rem;
     }
-    .gradient-bg {
-      background: linear-gradient(135deg, #000302 40%, #667eea 100%);
+
+    h2 {
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+      color: #34495e;
+      border-bottom: 2px solid #2980b9;
+      padding-bottom: 0.25rem;
     }
-    .card-hover {
-      transition: all 0.3s ease;
+
+    /* Tabela estilizada */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.8rem;
+      background: #fff;
+      box-shadow: 0 2px 5px rgb(0 0 0 / 0.05);
+      border-radius: 6px;
+      overflow: hidden;
     }
-    .card-hover:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    thead tr {
+      background: #2980b9;
+      color: #fff;
+      font-weight: 600;
+      text-align: center;
+      user-select: none;
     }
-    .input-glow:focus {
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+
+    td, th {
+      padding: 3px 4px;
+      border-bottom: 1px solid #ddd;
+      vertical-align: middle;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
     }
-    .number-input {
-      background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+
+    th.left, td.left {
+      text-align: left;
     }
+
+    /* Última linha sem borda inferior */
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Inputs */
+    input[type="number"], input[type="text"], select {
+      width: 100%;
+      padding: 6px 10px;
+      border: 1.5px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.2s ease-in-out;
+      text-align: right;
+      box-sizing: border-box;
+    }
+    input.taxa {
+      text-align: right;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #2980b9;
+      box-shadow: 0 0 4px rgba(41, 128, 185, 0.4);
+    }
+
+    /* Campos somente leitura com estilo */
+    input[readonly] {
+      background-color: #f3f3f3;
+      color: #666;
+      cursor: not-allowed;
+      text-align: center;
+    }
+
+    /* Linhas em destaque */
+    tr.bold {
+      font-weight: 700;
+      background-color: #eaf3fc;
+    }
+    tr.bold.highlight {
+      background-color: #fde5d9;
+    }
+
+    /* Alinhamento e margens no select */
+    #moeda {
+      max-width: 220px;
+      margin-left: 0;
+      display: block;
+      text-align: left;
+    }
+
+    /* Responsividade simples */
+  @media (max-width: 650px) {
+    td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      border-bottom: 1px solid #eee;
+      position: relative;
+    }
+      h1 {
+        font-size: 1.5rem;
+      }
+      table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+      }
+      thead tr {
+        display: none;
+      }
+      tr {
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgb(0 0 0 / 0.1);
+        background: white;
+        padding: 8px;
+      }
+      td {
+        text-align: right;
+        padding-left: flex;
+        position: relative;
+        border: none;
+        border-bottom: 1px solid #eee;
+      }
+      td.left {
+        text-align: left;
+      }
+  td[data-label]::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    width: 45%;
+    white-space: nowrap;
+    font-weight: bold;
+    color: #666;
+    text-align: left;
+  }
+      /* Labels dos dados - você pode personalizar para cada tabela via JS ou manual */
+      table:nth-of-type(1) td:nth-of-type(1)::before { content: " "; }
+      table:nth-of-type(1) td:nth-of-type(2)::before { content: "Dados do produto: "; }
+      table:nth-of-type(1) td:nth-of-type(3)::before { content: "Total"; }
+      table:nth-of-type(1) td:nth-of-type(4)::before { content: "Vl R$"; }
+      table:nth-of-type(1) td:nth-of-type(5)::before { content: "Total R$"; }
+    }
+
+    .moeda-cambio-cell {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    #moeda, #cambio {
+      width: 150px;
+      text-align: left;
+      padding: 1px;
+    }
+	
   </style>
 </head>
-<body class="min-h-screen gradient-bg p-4">
-  <div class="max-w-4xl mx-auto">
-    <!-- Header -->
-    <div class="text-center mb-8 animate-fade-in">
-      <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4 backdrop-blur-sm">
-        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-        </svg>
-      </div>
-      <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">
-        Simulador RT 2026
-      </h1>
-      <p class="text-white/80 text-lg">Cálculo de Impostos - Reforma Tributária</p>
-    </div>
+<body>
 
-    <!-- Info Card -->
-    <div class="glass-effect rounded-2xl p-6 mb-8 animate-slide-up">
-      <div class="flex items-start space-x-4">
-        <div class="flex-shrink-0">
-          <div class="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center">
-            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-        </div>
-        <div>
-          <h3 class="text-white font-semibold mb-2">Sobre esta ferramenta</h3>
-          <p class="text-white/80 text-sm leading-relaxed">
-            Esta ferramenta simula o cálculo de impostos em uma empresa Lucro Real, em um cenário de venda para 
-            <em class="text-accent font-medium">Industrialização</em> com base nos tributos aplicáveis a partir da Reforma Tributária. Atenção ao informar os percentuais de impostos.
-          </p>
-        </div>
-      </div>
-    </div>
 
-    <!-- Main Content Grid -->
-    <div class="grid lg:grid-cols-2 gap-8">
-      <!-- Input Form -->
-      <div class="glass-effect rounded-2xl p-6 card-hover animate-slide-up">
-        <div class="flex items-center space-x-3 mb-6">
-          <div class="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
-            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-            </svg>
-          </div>
-          <h2 class="text-xl font-bold text-white">Dados para Cálculo</h2>
+
+  <h1>SIMULADOR IMPORTAÇÃO</h1>
+  <h2>Reforma Tributária</h2>
+
+<p style="font-size: 11px;">
+<em>Esta ferramenta simula o cálculo de impostos em operações de IMPORTAÇÃO COMERCIAL, já considerando os novos impostos IBS, CBS e IS da Reforma Tributária.</em></p>
+
+<p style="font-size: 11px;">
+<strong>- A exemplo de Declaração de Importação (DI), preencha os dados e os percentuais dos impostos:</strong></p>
+
+     <!-- Seção Moeda e Câmbio -->
+    <section aria-labelledby="sec-cambio">
+      <h2 id="sec-cambio" data-i18n="currency_and_rate">CONVERSÃO</h2>
+      <fieldset>
+        <legend class="sr-only" data-i18n="currency_and_rate">Selecione</legend>
+
+        <div class="form-group">
+          <label for="moeda" data-i18n="select_currency">Moeda</label>
+          <select id="moeda" name="moeda">
+            <option value="USD-BRL" selected>Dólar (USD)</option>
+            <option value="EUR-BRL">Euro (EUR)</option>
+            <option value="GBP-BRL">Libra Esterlina (GBP)</option>
+            <option value="ARS-BRL">Peso Argentino (ARS)</option>
+            <option value="JPY-BRL">Iene Japonês (JPY)</option>
+            <option value="AUD-BRL">Dólar Australiano (AUD)</option>
+            <option value="CAD-BRL">Dólar Canadense (CAD)</option>
+            <option value="CHF-BRL">Franco Suíço (CHF)</option>
+            <option value="CNY-BRL">Yuan Chinês (CNY)</option>
+            <option value="NZD-BRL">Dólar Neozelandês (NZD)</option>
+            <option value="MXN-BRL">Peso Mexicano (MXN)</option>
+            <option value="KRW-BRL">Won Sul-Coreano (KRW)</option>
+            <option value="INR-BRL">Rupia Indiana (INR)</option>
+            <option value="ZAR-BRL">Rand Sul-Africano (ZAR)</option>
+          </select>
         </div>
 
-        <div class="space-y-4">
-          <!-- Valor Líquido -->
-          <div class="space-y-2">
-            <label class="block text-white font-medium text-sm">
-              Valor Líquido do Produto (custo + lucro)
-              <span class="text-white/60 text-xs block mt-1">
-                (não foi considerado Desp. Acess., Frete, Seguro, Descontos)
-              </span>
-            </label>
-            <div class="relative">
-              <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">R$</span>
-              <input type="text" inputmode="decimal" id="valorLiquido"
-       class="w-full pl-10 pr-4 py-3 number-input border border-white/20 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none input-glow transition-all duration-200"
-       placeholder="0,00">
-            </div>
+        <div class="form-group">
+          <label for="cambio" data-i18n="exchange_rate">Taxa de câmbio ou Digite</label>
+          <div class="input-with-icon">
+            <input
+              type="text"
+              id="cambio"
+              name="cambio"
+              inputmode="decimal"
+              required
+              aria-describedby="cambio-error"
+            />
+            <div id="cambio-loading" class="loading-spinner" aria-hidden="true"></div>
           </div>
-
-          <!-- Tax Inputs Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="space-y-2">
-              <label class="block text-white font-medium text-sm">ICMS (%)</label>
-              <input type="number" id="icms" value="18" step="0.01" 
-                     class="w-full px-4 py-3 number-input border border-white/20 rounded-xl text-gray-700 focus:outline-none input-glow transition-all duration-200">
-            </div>
-            
-            <div class="space-y-2">
-              <label class="block text-white font-medium text-sm">IPI (%)</label>
-              <input type="number" id="ipi" value="9.75" step="0.01" 
-                     class="w-full px-4 py-3 number-input border border-white/20 rounded-xl text-gray-700 focus:outline-none input-glow transition-all duration-200">
-            </div>
-            
-            <div class="space-y-2">
-              <label class="block text-white font-medium text-sm">PIS (%)</label>
-              <input type="number" id="pis" value="1.65" step="0.01" 
-                     class="w-full px-4 py-3 number-input border border-white/20 rounded-xl text-gray-700 focus:outline-none input-glow transition-all duration-200">
-            </div>
-            
-            <div class="space-y-2">
-              <label class="block text-white font-medium text-sm">COFINS (%)</label>
-              <input type="number" id="cofins" value="7.6" step="0.01" 
-                     class="w-full px-4 py-3 number-input border border-white/20 rounded-xl text-gray-700 focus:outline-none input-glow transition-all duration-200">
-            </div>
-            
-            <div class="space-y-2">
-              <label class="block text-white font-medium text-sm">IBS Estadual (%)</label>
-              <input type="number" id="ibse" value="0.10" step="0.01" 
-                     class="w-full px-4 py-3 number-input border border-white/20 rounded-xl text-gray-700 focus:outline-none input-glow transition-all duration-200">
-            </div>
-            
-            <div class="space-y-2">
-              <label class="block text-white font-medium text-sm">IBS Municipal (%)</label>
-              <input type="number" id="ibsm" value="0.00" step="0.01" 
-                     class="w-full px-4 py-3 number-input border border-white/20 rounded-xl text-gray-700 focus:outline-none input-glow transition-all duration-200">
-            </div>
-            
-            <div class="space-y-2">
-              <label class="block text-white font-medium text-sm">CBS (%)</label>
-              <input type="number" id="cbs" value="0.90" step="0.01" 
-                     class="w-full px-4 py-3 number-input border border-white/20 rounded-xl text-gray-700 focus:outline-none input-glow transition-all duration-200">
-            </div>
-            
-            <div class="space-y-2">
-              <label class="block text-white font-medium text-sm">IS (%)</label>
-              <input type="number" id="is" value="0.00" step="0.01" 
-                     class="w-full px-4 py-3 number-input border border-white/20 rounded-xl text-gray-700 focus:outline-none input-glow transition-all duration-200">
-            </div>
-          </div>
-
-          <!-- Calculate Button -->
-          <button onclick="calcular()" 
-                  class="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center space-x-2 mt-6">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 002 2z"></path>
-            </svg>
-            <span>Calcular Impostos</span>
-          </button>
+          <div id="cambio-error" class="error-message" role="alert"></div>
         </div>
-      </div>
+      </fieldset>
+    </section>
 
-      <!-- Results -->
-      <div class="glass-effect rounded-2xl p-6 card-hover animate-slide-up">
-        <div class="flex items-center space-x-3 mb-6">
-          <div class="w-8 h-8 bg-success/20 rounded-lg flex items-center justify-center">
-            <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-            </svg>
-          </div>
-          <h2 class="text-xl font-bold text-white">Resultado do Cálculo</h2>
-        </div>
+  <h2>COMPOSIÇÃO</h2>
+  <table>
+    <thead>
+      <tr>
+        <th class="left">Item</th>
+        <th>Dados do produto</th>
+        <th>Total</th>
+        <th>Vl R$</th>
+        <th>Total R$</th>
+      </tr>
+    </thead>
+    <tbody>
+<tr>
+  <td class="left">Quantidade</td>
+  <td data-label="Quantidade">
+  <input id="quantidade" class="taxa" value="10,000" min="0,001" step="any" aria-label="Quantidade" />
+  </td>
 
-        <div id="resultado" class="space-y-4">
-          <div class="bg-white/10 rounded-xl p-4 text-center">
-            <p class="text-white/80 text-sm mb-2">Clique em "Calcular Impostos" para ver os resultados</p>
-            <div class="w-12 h-12 mx-auto bg-white/20 rounded-full flex items-center justify-center animate-pulse-soft">
-              <svg class="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- Faça o mesmo para cada <td> que representa um campo de dados visível em telas menores -->
+<tr>
+  <td class="left">Vl Unit. FOB ($)</td>
+  <td data-label="Vl Produto FOB ($)"><input id="fob" class="taxa" value="27,758" aria-label="Valor FOB em moeda estrangeira" /></td>
+  <td data-label="Total" id="totalFOB"></td>
+  <td data-label="Vl R$" id="vlFOB"></td>
+  <td data-label="Total R$" id="totalFOBR"></td>
+</tr>
+
+<tr>
+  <td class="left">Frete internacional ($)</td>
+
+  <td data-label="Frete internacional ($)"><input id="frete" class="taxa" value="1,02" aria-label="Frete internacional" /></td>
+  <td data-label="Total"></td>
+  <td data-label="Vl R$" id="vlFrete"></td>
+  <td data-label="Total R$" id="totalFreteR"></td>
+</tr>
+<tr>
+  <td class="left">Seguro internacional ($)</td>
+  <td data-label="Seguro internacional ($)"><input id="seguro" class="taxa" value="0,00" aria-label="Seguro internacional" /></td>
+  <td data-label="Total"></td>
+  <td data-label="Vl R$" id="vlSeguro"></td>
+  <td data-label="Total R$" id="totalSeguroR"></td>
+</tr>
+      <tr class="bold">
+        <td class="left">TOTAL ADUANEIRO (R$)</td>
+        <td colspan="4" id="va"></td>
+
+      </tr>
+<tr>
+  <td class="left">Acrescimos (capatazia) (R$)</td>
+  <td colspan="4" data-label="Acrescimos (capatazia) (R$)">
+    <input id="capatazia" class="taxa" value="8,82" aria-label="Acrescimos capatazia" />
+  </td>
+</tr>
+      <tr class="bold">
+        <td class="left">TOTAL ADUANEIRO CIF (R$)</td>
+        <td colspan="4" id="cif"></td>
+      </tr>
+    </tbody>
+  </table>
 
 
-<!-- Footer -->
-<footer class="glass-effect rounded-2xl p-6 mt-8 text-center animate-fade-in text-white text-sm space-y-4">
+  <h2>ENCARGOS ADUANEIROS (R$)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th class="left">Impostos e Despesas</th>
+        <th>Base</th>
+        <th>Taxa (%)</th>
+        <th>Total R$</th>
+      </tr>
+    </thead>
+    <tbody>
+<tr>
+  <td class="left">Imposto de Importação (II)</td>
+  <td data-label="Base" id="baseII"></td>
+  <td data-label="Taxa (%)"><input id="taxaII" class="taxa" value="14,40" aria-label="Taxa Imposto de Importação" /></td>
+  <td data-label="Total R$" id="totalII"></td>
+</tr>
+<tr>
+  <td class="left">IPI</td>
+  <td data-label="Base" id="baseIPI"></td>
+  <td data-label="Taxa (%)"><input id="taxaIPI" class="taxa" value="0,00" aria-label="Taxa IPI" /></td>
+  <td data-label="Total R$" id="totalIPI"></td>
+</tr>
+<tr>
+  <td class="left">PIS</td>
+  <td data-label="Base" id="basePIS"></td>
+  <td data-label="Taxa (%)"><input id="taxaPIS" class="taxa" value="0,00" aria-label="Taxa PIS" /></td>
+  <td data-label="Total R$" id="totalPIS"></td>
+</tr>
+<tr>
+  <td class="left">COFINS</td>
+  <td data-label="Base" id="baseCOFINS"></td>
+  <td data-label="Taxa (%)"><input id="taxaCOFINS" class="taxa" value="0,00" aria-label="Taxa COFINS" /></td>
+  <td data-label="Total R$" id="totalCOFINS"></td>
+</tr>
+<tr>
+  <td class="left">IS-Imposto Seletivo (ad valorem)</td>
+  <td data-label="Base" id="baseIS1"></td>
+  <td data-label="Taxa (%)"><input id="taxaIS1" class="taxa" value="0,00" readonly aria-label="Taxa Imposto Seletivo 1" /></td>
+  <td data-label="Total R$" id="totalIS1"></td>
+</tr>
 
-  <!-- Título e descrição -->
-  <div class="flex items-center justify-center space-x-2">
-    <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-    <span class="text-white/80">Simulador RT 2026</span>
-  </div>
+<tr>
+  <td class="left">Taxa Siscomex</td>
+  <td colspan="2"></td>
+  <td data-label="Total R$"><input id="totalSiscomex" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Taxa Siscomex" /></td>
+</tr>
+<tr>
+  <td class="left">AFRMM</td>
+  <td colspan="2"></td>
+  <td data-label="Total R$"><input id="totalAFRMM" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total AFRMM" /></td>
+</tr>
+<tr>
+  <td class="left">CIDE-Combustíveis</td>
+  <td colspan="2"></td>
+  <td data-label="Total R$"><input id="totalCIDE" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total CIDE-Combustíveis" /></td>
+</tr>
+<tr>
+  <td class="left">Antidumping</td>
+  <td colspan="2"></td>
+  <td data-label="Total R$"><input id="totalAntidumping" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Antidumping" /></td>
+</tr>
+<tr>
+  <td class="left">Compensatórios</td>
+  <td colspan="2"></td>
+  <td data-label="Total R$"><input id="totalCompensatorios" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Compensatórios" /></td>
+</tr>
+<tr>
+  <td class="left">Salvaguardas</td>
+  <td colspan="2"></td>
+  <td data-label="Total R$"><input id="totalSalvaguardas" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Salvaguardas" /></td>
+</tr>
+<tr>
+  <td class="left">Outros tributos</td>
+  <td colspan="2"></td>
+  <td data-label="Total R$"><input id="totalOutros" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Outros Tributos" /></td>
+</tr>	
 
-  <!-- Feedback -->
-  <div>
-    <a href="https://forms.gle/FgHaFehB74mNmxH98" target="_blank" class="text-teal-300 hover:underline">
-      ✅ Dê seu feedback sobre este conteúdo
+      <tr class="bold">
+        <td class="left">TOTAL ADUANEIRO EM REAIS R$ = VL Aduaneiro CIF + ENCARGOS - IS </td>
+        <td colspan="3" id="totalEncargos"></td>
+      </tr>
+     
+    </tbody>
+
+  </table>
+
+  <h2>BASE DE CÁLCULO DO ICMS</h2>
+  <table>
+    <thead>
+      <tr>
+        <th class="left">Impostos</th>
+        <th>Base</th>
+        <th>Taxa (%)</th>
+        <th>Fator</th>
+        <th>Total ICMS</th>
+      </tr>
+    </thead>
+    <tbody>
+     <tr>
+  <td class="left">ICMS</td>
+  <td data-label="Base" id="baseICMS"></td>
+  <td data-label="Taxa (%)"><input id="taxaICMS" class="taxa" value="18,00" aria-label="Taxa ICMS" /></td>
+  <td data-label="Fator" id="fatorICMS"></td>
+  <td data-label="Total ICMS" id="totalICMS"></td>
+</tr>
+    </tbody>
+  </table>
+
+  <h2>BASE DE CÁLCULO DO IBS/CBS/IS</h2>
+  <table>
+    <thead>
+      <tr>
+        <th class="left">Imposto Reforma Tributária</th>
+        <th>Base</th>
+        <th>Taxa (%)</th>
+        <th>Total R$</th>
+      </tr>
+    </thead>
+    <tbody>
+   <tr>
+  <td class="left">IBS Municial (Base art. 65 LC 214/25)</td>
+  <td data-label="Base" id="baseIBSM"></td>
+  <td data-label="Taxa (%)"><input id="taxaIBSM" class="taxa" value="0,00" aria-label="Taxa IBS Municipal" /></td>
+  <td data-label="Total R$" id="totalIBSM"></td>
+</tr>
+<tr>
+  <td class="left">IBS Estadual (Base art. 65 LC 214/25)</td>
+  <td data-label="Base" id="baseIBSE"></td>
+  <td data-label="Taxa (%)"><input id="taxaIBSE" class="taxa" value="0,10" aria-label="Taxa IBS Estadual" /></td>
+  <td data-label="Total R$" id="totalIBSE"></td>
+</tr>
+<tr>
+  <td class="left">CBS (Base art. 65 LC 214/25)</td>
+  <td data-label="Base" id="baseCBS"></td>
+  <td data-label="Taxa (%)"><input id="taxaCBS" class="taxa" value="0,90" aria-label="Taxa CBS" /></td>
+  <td data-label="Total R$" id="totalCBS"></td>
+</tr>
+<tr>
+  <td class="left">IS-Imposto Seletivo (Base art. 434 LC 214/25)</td>
+  <td data-label="Base" id="baseIS2"></td>
+  <td data-label="Taxa (%)"><input id="taxaIS2" class="taxa" value="0,00" aria-label="Taxa Imposto Seletivo 2" /></td>
+  <td data-label="Total R$" id="totalIS2"></td>
+</tr>
+
+      <tr class="bold">
+        <td class="left">TOTAL DOS IMPOSTOS RT</td>
+        <td colspan="3" id="totalRT"></td>
+      </tr>
+     
+    </tbody>
+  </table>
+
+
+ <h2>TOTAL</h2>
+  <table>
+    <thead>
+
+<tr>
+      <th class="left">DEMONSTRATIVO DE VALORES</th>
+        <th></th>
+        <th></th>
+        <th></th>
+  </thead>
+        <tr class="bold">
+        <td class="left">VALOR TOTAL DO PRODUTO</td>
+        <td colspan="3" id="totalprodutos"></td>
+      </tr>
+
+        <tr class="bold">
+        <td class="left">VALOR TOTAL DA NOTA FISCAL</td>
+        <td colspan="3" id="totalNF"></td>
+      </tr>  
+
+
+    </tbody>
+
+  </table>
+
+
+
+  <script>
+    // Função para arredondar com 2 casas decimais
+    const arred = val => +(val.toFixed(2));
+
+    function calcular() {
+      const qtd = parseFloat(document.getElementById('quantidade').value.replace(',', '.')) || 0;
+      const cambio = parseFloat(document.getElementById('cambio').value.replace(',', '.')) || 0;
+      const fob = parseFloat(document.getElementById('fob').value.replace(',', '.')) || 0;
+      const frete = parseFloat(document.getElementById('frete').value.replace(',', '.')) || 0;
+      const seguro = parseFloat(document.getElementById('seguro').value.replace(',', '.')) || 0;
+      const capatazia = parseFloat(document.getElementById('capatazia').value.replace(',', '.')) || 0;
+
+      const totalFOB = arred(fob * qtd);
+      const totalFOBR = arred(totalFOB * cambio);
+      const freteR = arred(frete * cambio);
+      const seguroR = arred(seguro * cambio);
+      const va = arred(totalFOBR + freteR + seguroR);
+      const cif = arred(va + capatazia);
+
+      const taxaII = (parseFloat(document.getElementById('taxaII').value.replace(',', '.')) || 0) / 100;
+      const taxaIPI = (parseFloat(document.getElementById('taxaIPI').value.replace(',', '.')) || 0) / 100;
+      const taxaPIS = (parseFloat(document.getElementById('taxaPIS').value.replace(',', '.')) || 0) / 100;
+      const taxaCOFINS = (parseFloat(document.getElementById('taxaCOFINS').value.replace(',', '.')) || 0) / 100;
+      const taxaIS2 = (parseFloat(document.getElementById('taxaIS2').value.replace(',', '.')) || 0) / 100;
+
+const siscomex = parseFloat(document.getElementById('totalSiscomex')?.value.replace(',', '.') || 0);
+const afrmm = parseFloat(document.getElementById('totalAFRMM')?.value.replace(',', '.') || 0);
+const cide = parseFloat(document.getElementById('totalCIDE')?.value.replace(',', '.') || 0);
+const antidumping = parseFloat(document.getElementById('totalAntidumping')?.value.replace(',', '.') || 0);
+const compensatorios = parseFloat(document.getElementById('totalCompensatorios')?.value.replace(',', '.') || 0);
+const salvaguardas = parseFloat(document.getElementById('totalSalvaguardas')?.value.replace(',', '.') || 0);
+const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(',', '.') || 0);
+
+
+  
+
+
+      // Sincroniza taxaIS1 com taxaIS2
+      document.getElementById('taxaIS1').value = (taxaIS2 * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      const taxaIS1 = taxaIS2;
+
+      const taxaICMS = (parseFloat(document.getElementById('taxaICMS').value.replace(',', '.')) || 0) / 100;
+      const taxaIBSM = (parseFloat(document.getElementById('taxaIBSM').value.replace(',', '.')) || 0) / 100;
+      const taxaIBSE = (parseFloat(document.getElementById('taxaIBSE').value.replace(',', '.')) || 0) / 100;
+      const taxaCBS = (parseFloat(document.getElementById('taxaCBS').value.replace(',', '.')) || 0) / 100;
+
+      const totalII = arred(cif * taxaII);
+      const totalIPI = arred((cif + totalII) * taxaIPI);
+      const totalPIS = arred(cif * taxaPIS);
+      const totalCOFINS = arred(cif * taxaCOFINS);
+      const totalIS1 = arred((cif + totalII) * taxaIS1);
+
+      const totalEncargos = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalIS1 - totalIS1 + siscomex + afrmm + cide + antidumping + compensatorios + salvaguardas + outros);
+      const totalprodutos = arred(totalEncargos - totalIS1 + totalIS1);
+
+      const fatorICMS = +(1 - taxaICMS).toFixed(4);
+      const baseICMS = fatorICMS !== 0 ? arred(totalprodutos / fatorICMS) : 0;
+      const totalICMS = arred(baseICMS * taxaICMS);
+
+      const totalIBSM = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1) * taxaIBSM);
+      const totalIBSE = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1) * taxaIBSE);
+      const totalCBS = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1) * taxaCBS);
+      const totalIS2 = arred((cif + totalII) * taxaIS2);
+
+      const totalNF = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalICMS + totalIBSM + totalIBSE + totalCBS + totalIS1);
+
+      // Atualiza DOM
+      document.getElementById('totalFOB').textContent = totalFOB.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('vlFOB').textContent = arred(fob * cambio).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalFOBR').textContent = totalFOBR.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('vlFrete').textContent = freteR.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalFreteR').textContent = freteR.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('vlSeguro').textContent = seguroR.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalSeguroR').textContent = seguroR.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('va').textContent = va.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('cif').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('baseII').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIPI').textContent = (cif + totalII).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('basePIS').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseCOFINS').textContent = cif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIS1').textContent = (cif + totalII).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('totalII').textContent = totalII.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalIPI').textContent = totalIPI.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalPIS').textContent = totalPIS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalCOFINS').textContent = totalCOFINS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalIS1').textContent = totalIS1.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('totalEncargos').textContent = totalEncargos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalprodutos').textContent = totalprodutos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('baseICMS').textContent = baseICMS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('fatorICMS').textContent = fatorICMS.toFixed(4);
+      document.getElementById('totalICMS').textContent = totalICMS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('baseIBSM').textContent = (totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIBSE').textContent = (totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseCBS').textContent = (totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('baseIS2').textContent = (cif + totalII).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('totalIBSM').textContent = totalIBSM.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalIBSE').textContent = totalIBSE.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalCBS').textContent = totalCBS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalIS2').textContent = totalIS2.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('totalRT').textContent = (totalIBSM + totalIBSE + totalCBS + totalIS1).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      document.getElementById('totalNF').textContent = totalNF.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    }
+
+    // Evento para recalcular sempre que mudar algum input
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calcular);
+    });
+
+    calcular();
+
+    // Controle de atualização manual do câmbio
+    let cambioManual = false;
+    const campoCambio = document.getElementById('cambio');
+    const selectMoeda = document.getElementById('moeda');
+
+    async function atualizarCambio() {
+      if (cambioManual) return;
+      const moeda = selectMoeda.value;
+      try {
+        const resposta = await fetch(`https://economia.awesomeapi.com.br/json/last/${moeda}`);
+        const dados = await resposta.json();
+        const parMoeda = moeda.replace('-', '');
+        const bid = parseFloat(dados[parMoeda].bid.replace(',', '.')).toFixed(4);
+        campoCambio.value = bid.replace('.', ','); // Mantém vírgula para padrão BR
+        calcular();
+      } catch (erro) {
+        console.error("Erro ao buscar câmbio:", erro);
+      }
+    }
+
+    selectMoeda.addEventListener('change', () => {
+      cambioManual = false;
+      atualizarCambio();
+    });
+
+    campoCambio.addEventListener('input', () => {
+      cambioManual = true;
+      calcular();
+    });
+
+    window.addEventListener('load', atualizarCambio);
+  </script>
+
+
+<script src="https://unpkg.com/imask"></script>
+<script>
+  const inputCambio = document.getElementById('cambio');
+  IMask(inputCambio, {
+    mask: Number,
+    scale: 4,
+    signed: false,
+    thousandsSeparator: '',
+    padFractionalZeros: true,
+    normalizeZeros: true,
+    radix: ','
+  });
+</script>
+
+
+  <footer class="footer">
+
+    <a href="https://forms.gle/FgHaFehB74mNmxH98" target="_blank">De seu feedback, avalie este conteúdo &#10004</a><p>
+    <h3><strong>e-book's &#128217 de estudos Fiscais na Amazon:</strong></h3>
+    <a href="https://www.amazon.com.br/dp/B0FB4BDH8V" target="_blank">■ CRÉDITOS DE IBS e CBS: uso e consumo pessoal</a><br>
+    <a href="https://www.amazon.com.br/dp/B0DHGB27K2" target="_blank">■ EXCLUSÃO ICMS DA BASE PIS E COFINS: formação do preço</a><br>
+ </footer>
+
+
+
+
+<br>
+<footer class="footer">
+
+    Simulador desenvolvido com base na Lei Complementar nº 214, de 16/01/2025 e legislação anterior.<br>
+    &copy; 2025 Diego D'angelo. Licenciado sob 
+    <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a><br><br>
+    Me siga no LinkedIn – 
+    <a href="https://www.linkedin.com/in/diegodangelo-di-ryco/" target="_blank">Diego Dangelo</a>
+    <a href="https://www.linkedin.com/in/diegodangelo-di-ryco/" target="_blank" style="text-decoration: none;">
+      <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" loading="lazy" alt="LinkedIn" width="30" height="30" style="vertical-align: middle;">
     </a>
-  </div>
 
-  <!-- eBooks Amazon -->
-  <div>
-    <h3 class="font-semibold">📚 eBooks de Estudos Fiscais na Amazon:</h3>
-    <a href="https://www.amazon.com.br/dp/B0FB4BDH8V" target="_blank" class="block text-blue-300 hover:underline">
-      ■ CRÉDITOS DE IBS e CBS: uso e consumo pessoal
-    </a>
-    <a href="https://www.amazon.com.br/dp/B0DHGB27K2" target="_blank" class="block text-blue-300 hover:underline">
-      ■ EXCLUSÃO ICMS DA BASE PIS E COFINS: formação do preço de venda
-    </a>
-  </div>
+  </footer>
 
-  <!-- Informações legais -->
-  <div class="text-white/60 text-xs">
-    Simulador desenvolvido para auxiliar no cálculo de impostos da Reforma Tributária com base na Lei Complementar nº 214, de 16/01/2025 e legislação anterior.<br>
-    &copy; 2025 Diego D'Angelo. Licenciado sob
-    <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" class="text-white/70 underline">
-      CC BY 4.0
-    </a>
-  </div>
-
-  <!-- LinkedIn -->
-  <div>
-    Me siga no LinkedIn –
-    <a href="https://www.linkedin.com/in/diegodangelo-di-ryco/" target="_blank" class="text-sky-400 hover:underline">
-      Diego D'Angelo
-    </a>
-    <a href="https://www.linkedin.com/in/diegodangelo-di-ryco/" target="_blank" class="inline-block ml-1">
-      <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" width="20" height="20" class="inline-block align-middle">
-    </a>
-  </div>
-
-  <!-- Botão de Compartilhar -->
-  <button onclick="compartilhar()" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-md transition">
-    🔗 Compartilhar esta página
-  </button>
-
-</footer>
+<button onclick="compartilhar()">🔗 Compartilhe esta página</button>
 
 <script>
 function compartilhar() {
@@ -285,174 +704,21 @@ function compartilhar() {
     alert('Compartilhamento não suportado neste navegador. Copie o link manualmente:\n\nhttps://odangdi.github.io/simulador-rt2026/');
   }
 }
-
 </script>
 
 
-
-
-  </div>
-
-  <script>
-    function formatarMoeda(valor) {
-      return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      }).format(valor);
-    }
-
-    function formatarPercentual(valor) {
-      return new Intl.NumberFormat('pt-BR', {
-        style: 'percent',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }).format(valor / 100);
-    }
-
-function calcular() {
-const valorLiquido = parseFloat(document.getElementById('valorLiquido').value.replace(/\./g, '').replace(',', '.')) || 0;
-
-  const icms = (parseFloat(document.getElementById('icms').value) || 0) / 100;
-  const ipi = (parseFloat(document.getElementById('ipi').value) || 0) / 100;
-  const pis = (parseFloat(document.getElementById('pis').value) || 0) / 100;
-  const cofins = (parseFloat(document.getElementById('cofins').value) || 0) / 100;
-  const ibse = (parseFloat(document.getElementById('ibse').value) || 0) / 100;
-  const ibsm = (parseFloat(document.getElementById('ibsm').value) || 0) / 100;
-  const cbs = (parseFloat(document.getElementById('cbs').value) || 0) / 100;
-  const is = (parseFloat(document.getElementById('is').value) || 0) / 100;
-
-  // Calcula fator considerando o efeito do ICMS sobre PIS e COFINS (não cumulativo)
-  const fator = 1 - (icms + (pis * (1 - icms)) + (cofins * (1 - icms)));
-
-  // Valor bruto antes dos impostos embutidos
-  const valorBruto = valorLiquido / fator;
-
-  // Cálculos dos impostos conforme bases:
-  const valorICMS = valorBruto * icms;
-  const valorSemICMS = valorBruto - valorICMS;
-  const valorPIS = valorSemICMS * pis;
-  const valorCOFINS = valorSemICMS * cofins;
-  const valorIPI = valorBruto * ipi;
-  
-  // Valor total da nota: valor bruto + IPI
-  const totalNota = valorBruto + valorIPI;
-
-  // IS: base é valor líquido
-  const baseIS = valorLiquido;
-  const valorIS = baseIS * is;
-
-  // IBS e CBS: base é valor líquido + IS
-  const baseIBSCBS = baseIS + valorIS;
-  const valorIBSe = baseIBSCBS * ibse;
-  const valorIBSm = baseIBSCBS * ibsm;
-  const valorCBS = baseIBSCBS * cbs;
-
-  // Carga tributária tradicional (ICMS + IPI + PIS + COFINS)
-  const cargaTributaria = valorICMS + valorIPI + valorPIS + valorCOFINS;
-
-  // Carga tributária LC 2014/2025 (IBS + CBS + IS)
-  const cargaTributariaLC = valorIBSe + valorIBSm + valorCBS + valorIS;
-
-  // Soma total dos impostos para detalhes
-  const totalImpostos = valorICMS + valorPIS + valorCOFINS + valorIPI + valorIS + valorIBSe + valorIBSm + valorCBS;
-
-  // Preparar array para detalhamento
-  const impostos = [
-    { nome: 'ICMS', percentual: icms * 100, valor: valorICMS, cor: 'bg-red-500' },
-    { nome: 'IPI', percentual: ipi * 100, valor: valorIPI, cor: 'bg-blue-500' },
-    { nome: 'PIS', percentual: pis * 100, valor: valorPIS, cor: 'bg-green-500' },
-    { nome: 'COFINS', percentual: cofins * 100, valor: valorCOFINS, cor: 'bg-yellow-500' },
-    { nome: 'IBS Estadual', percentual: ibse * 100, valor: valorIBSe, cor: 'bg-purple-500' },
-    { nome: 'IBS Municipal', percentual: ibsm * 100, valor: valorIBSm, cor: 'bg-pink-500' },
-    { nome: 'CBS', percentual: cbs * 100, valor: valorCBS, cor: 'bg-indigo-500' },
-    { nome: 'IS', percentual: is * 100, valor: valorIS, cor: 'bg-orange-500' }
-  ];
-
-
-// Exibir resultados principais
-let resultadoHTML = `
-  <div class="grid grid-cols--1 sm:grid-cols-3 gap-4 mb-6">
-    <div class="bg-white/10 rounded-xl px-0 py-3 text-center">
-      <div class="text-xs sm:text-sm font-bold text-white mb-1 break-words">R$ ${valorBruto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-      <div class="text-white/60 text-xs">Valor Total dos Produtos</div>
-    </div>
-    <div class="bg-white/10 rounded-xl px-0 py-3 text-center">
-      <div class="text-xs sm:text-sm font-bold text-warning mb-1 break-words">R$ ${cargaTributaria.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-      <div class="text-white/60 text-xs">Carga Tributária ICMS, IPI, PIS, Cofins</div>
-    </div>
-    <div class="bg-white/10 rounded-xl px-0 py-3 text-center">
-      <div class="text-xs sm:text-sm font-bold text-accent mb-1 break-words">R$ ${cargaTributariaLC.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-      <div class="text-white/60 text-xs">Carga Tributária IBS, CBS, IS (somente informativo em 2026)</div>
-    </div>
-    <div class="bg-white/10 rounded-xl px-0 py-3 text-center col-span-3">
-      <div class="text-xs sm:text-sm font-bold text-accent mb-1 break-words">R$ ${totalNota.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-      <div class="text-white/60 text-xs">Valor Total da Nota (sem IBS, CBS, IS)</div>
-    </div>
-  </div>
-
-
-
-
-    <div class="space-y-3">
-      <h3 class="text-white font-semibold mb-4 flex items-center space-x-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-        </svg>
-        <span>Detalhamento dos Impostos</span>
-      </h3>`;
-
-  impostos.forEach(imposto => {
-  const percentualDoTotal = (imposto.valor / totalImpostos) * 100;
-  if (imposto.valor > 0) {
-    resultadoHTML += `
-      <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors duration-200">
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center space-x-3">
-            <div class="w-3 h-3 ${imposto.cor} rounded-full"></div>
-            <span class="text-white font-medium">${imposto.nome}</span>
-            <span class="text-white/60 text-sm">${imposto.percentual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</span>
-          </div>
-          <span class="text-white font-semibold">R$ ${imposto.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-        </div>
-        <div class="w-full bg-white/10 rounded-full h-2">
-          <div class="${imposto.cor} h-2 rounded-full transition-all duration-500" style="width: ${percentualDoTotal.toFixed(2)}%"></div>
-        </div>
-      </div>`;
-  }
-});
-
-
-  resultadoHTML += `</div>`;
-
-  document.getElementById('resultado').innerHTML = resultadoHTML;
-  document.getElementById('resultado').style.animation = 'slideUp 0.5s ease-out';
-}
-
-// Máscara de moeda BRL no campo valorLiquido
-document.getElementById('valorLiquido').addEventListener('input', function(e) {
-  let value = e.target.value;
-
-  // Remove tudo que não for dígito
-  value = value.replace(/\D/g, '');
-
-  if (value === '') {
-    e.target.value = '';
-    return;
-  }
-
-  // Formata como moeda brasileira
-  value = (parseInt(value, 10) / 100).toFixed(2);
-  value = value.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-  e.target.value = value;
-});
-
-
-    // Initialize with default calculation
-    window.addEventListener('load', function() {
-      setTimeout(calcular, 500);
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
+        .catch(err => console.log('Falha ao registrar Service Worker:', err));
     });
-
+  }
 </script>
+
+
+
+
 </body>
 </html>
