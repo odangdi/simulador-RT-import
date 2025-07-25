@@ -1,4 +1,4 @@
-const cacheName = 'simulador-rt-cache-v1';
+const cacheName = 'simulador-rt-import';
 const filesToCache = [
   './',
   './index.html',
