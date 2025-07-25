@@ -7,7 +7,8 @@
   <meta name="theme-color" content="#2980b9">
   <link rel="icon" href="icon.png">
   <title>Simulador DI Importação - Reforma Tributária</title>
-
+  <script src="https://unpkg.com/imask"></script>
+  
 
 <!-- META TAGS PARA COMPARTILHAMENTO SOCIAL -->
 
@@ -22,7 +23,7 @@
 
 
 
-  <style>
+<style>
     /* Reset básico e fonte */
     * {
       box-sizing: border-box;
@@ -207,6 +208,18 @@
       text-align: left;
       padding: 1px;
     }
+
+IMask(campoCambio, {
+  mask: Number,
+  scale: 4,
+  thousandsSeparator: '.',
+  radix: ',',
+  padFractionalZeros: true,
+  normalizeZeros: true,
+  min: 0,
+});
+
+
 	
   </style>
 </head>
@@ -622,60 +635,81 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
       document.getElementById('totalNF').textContent = totalNF.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     }
 
-    // Evento para recalcular sempre que mudar algum input
-    document.querySelectorAll('input, select').forEach(el => {
-      el.addEventListener('input', calcular);
-    });
+window.addEventListener('load', () => {
+  const campoCambio = document.getElementById('cambio');
+  const selectMoeda = document.getElementById('moeda');
+  let cambioManual = false;
 
-    calcular();
+  // Variáveis para cache
+  let cacheCambio = null;
+  let cacheTimestamp = 0;
+  const CACHE_TEMPO = 300000; // 5 minutos em ms
 
-    // Controle de atualização manual do câmbio
-    let cambioManual = false;
-    const campoCambio = document.getElementById('cambio');
-    const selectMoeda = document.getElementById('moeda');
-
-    async function atualizarCambio() {
-      if (cambioManual) return;
-      const moeda = selectMoeda.value;
-      try {
-        const resposta = await fetch(`https://economia.awesomeapi.com.br/json/last/${moeda}`);
-        const dados = await resposta.json();
-        const parMoeda = moeda.replace('-', '');
-        const bid = parseFloat(dados[parMoeda].bid.replace(',', '.')).toFixed(4);
-        campoCambio.value = bid.replace('.', ','); // Mantém vírgula para padrão BR
-        calcular();
-      } catch (erro) {
-        console.error("Erro ao buscar câmbio:", erro);
-      }
-    }
-
-    selectMoeda.addEventListener('change', () => {
-      cambioManual = false;
-      atualizarCambio();
-    });
-
-    campoCambio.addEventListener('input', () => {
-      cambioManual = true;
-      calcular();
-    });
-
-    window.addEventListener('load', atualizarCambio);
-  </script>
-
-
-<script src="https://unpkg.com/imask"></script>
-<script>
-  const inputCambio = document.getElementById('cambio');
-  IMask(inputCambio, {
+  IMask(campoCambio, {
     mask: Number,
     scale: 4,
-    signed: false,
-    thousandsSeparator: '',
+    thousandsSeparator: '.',
+    radix: ',',
     padFractionalZeros: true,
     normalizeZeros: true,
-    radix: ','
+    min: 0,
   });
+
+  async function atualizarCambio() {
+    if (cambioManual) return;
+
+    const agora = Date.now();
+
+    // Usa cache se estiver válido
+    if (cacheCambio && (agora - cacheTimestamp) < CACHE_TEMPO) {
+      campoCambio.value = cacheCambio;
+      calcular();
+      return;
+    }
+
+    const moeda = selectMoeda.value;
+    try {
+      const resposta = await fetch(`https://economia.awesomeapi.com.br/json/last/${moeda}`);
+      if (!resposta.ok) throw new Error('Erro na resposta da API');
+
+      const dados = await resposta.json();
+      const parMoeda = moeda.replace('-', '');
+      const bidRaw = dados[parMoeda]?.bid;
+
+      if (!bidRaw) throw new Error('Dados inválidos');
+
+      const bid = parseFloat(bidRaw.replace(',', '.')).toFixed(4);
+      const bidFormatado = bid.replace('.', ',');
+
+      campoCambio.value = bidFormatado;
+
+      // Atualiza cache
+      cacheCambio = bidFormatado;
+      cacheTimestamp = agora;
+
+      calcular();
+    } catch (erro) {
+      campoCambio.disabled = false;
+      alert('⚠️ Erro ao buscar taxa de câmbio. Por favor, digite manualmente.');
+    }
+  }
+
+  selectMoeda.addEventListener('change', () => {
+    cambioManual = false;
+    atualizarCambio();
+  });
+
+  campoCambio.addEventListener('input', () => {
+    cambioManual = true;
+    campoCambio.disabled = false;
+    calcular();
+  });
+
+  atualizarCambio();
+});
+
 </script>
+
 
 
   <footer class="footer">
@@ -709,14 +743,14 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
 function compartilhar() {
   if (navigator.share) {
     navigator.share({
-      title: 'Simulador RT 2026',
+      title: 'Simulador DI Importação',
       text: 'Confira este simulador de impostos baseado na Reforma Tributária!',
       url: 'https://odangdi.github.io/simulador-rt2026/',
     })
     .then(() => console.log('Compartilhado com sucesso'))
     .catch((error) => console.log('Erro ao compartilhar:', error));
   } else {
-    alert('Compartilhamento não suportado neste navegador. Copie o link manualmente:\n\nhttps://odangdi.github.io/simulador-rt2026/');
+    alert('Compartilhamento não suportado neste navegador. Copie o link manualmente:\n\nhttps://odangdi.github.io/simulador-RT-import/');
   }
 }
 </script>

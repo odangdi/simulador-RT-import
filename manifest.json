@@ -1,6 +1,6 @@
 {
-  "name": "Simulador RT Importação",
-  "short_name": "Simulador RT Import",
+  "name": "Simulador DI Importação - Reforma Tributária",
+  "short_name": "Simulador DI Importação - Reforma Tributária",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
