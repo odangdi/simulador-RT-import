@@ -16,7 +16,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://odangdi.github.io/simulador-RT-import/">
 <meta property="og:title" content="Simulador DI Importação - Reforma Tributária">
-<meta property="og:description" content="Esta ferramenta realiza a simulação detalhada dos tributos incidentes em operações de importação comercial via DI, considerando tanto a estrutura tributária atual quanto os novos impostos previstos na Reforma Tributária de 2026, como IBS, CBS e IS. Ideal para empresas que desejam antecipar os impactos fiscais e planejar com precisão suas operações.">
+<meta property="og:description" content="Esta ferramenta realiza a simulação detalhada dos tributos incidentes em operações de importação comercial com DI, considerando tanto a estrutura tributária atual quanto os novos impostos previstos na Reforma Tributária de 2026, como IBS, CBS e IS. Ideal para empresas que desejam antecipar os impactos fiscais e planejar com precisão suas operações.">
 <meta property="og:image" content="https://raw.githubusercontent.com/odangdi/simulador-RT-import/main/Tela%20simulador%20importação.jpg">
 <meta name="author" content="Diego D'Angelo">
 
@@ -231,7 +231,7 @@ IMask(campoCambio, {
   <h2>Reforma Tributária</h2>
 
 <p style="font-size: 11px;">
-<em>Esta ferramenta simula o cálculo de impostos em operações de IMPORTAÇÃO COMERCIAL, já considerando os novos impostos IBS, CBS e IS da Reforma Tributária.</em></p>
+<em>Esta ferramenta realiza a simulação detalhada dos tributos incidentes em operações de IMPORTAÇÃO COMERCIAL COM DI, considerando tanto a estrutura tributária atual quanto os novos impostos previstos na Reforma Tributária de 2026, como IBS, CBS e IS. Ideal para empresas que desejam antecipar os impactos fiscais e planejar com precisão suas operações.</em></p>
 
 <p style="font-size: 11px;">
 <strong>- A exemplo de Declaração de Importação (DI), preencha os dados e os percentuais dos impostos:</strong></p>
@@ -245,7 +245,8 @@ IMask(campoCambio, {
         <div class="form-group">
           <label for="moeda" data-i18n="select_currency">Moeda</label>
           <select id="moeda" name="moeda">
-            <option value="USD-BRL" selected>Dólar (USD)</option>
+            <option value="">Selecione</option>
+            <option value="USD-BRL">Dólar (USD)</option>
             <option value="EUR-BRL">Euro (EUR)</option>
             <option value="GBP-BRL">Libra Esterlina (GBP)</option>
             <option value="ARS-BRL">Peso Argentino (ARS)</option>
@@ -263,15 +264,9 @@ IMask(campoCambio, {
         </div>
 
         <div class="form-group">
-          <label for="cambio" data-i18n="exchange_rate">Taxa de câmbio ou Digite</label>
+          <label for="cambio" data-i18n="exchange_rate">Taxa de câmbio</label>
           <div class="input-with-icon">
-            <input
-              type="text"
-              id="cambio"
-              name="cambio"
-              inputmode="decimal"
-              required
-              aria-describedby="cambio-error"
+            <input type="text" id="cambio" name="cambio" inputmode="decimal" required aria-describedby="cambio-error"
             />
             <div id="cambio-loading" class="loading-spinner" aria-hidden="true"></div>
           </div>
@@ -638,6 +633,8 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
 window.addEventListener('load', () => {
   const campoCambio = document.getElementById('cambio');
   const selectMoeda = document.getElementById('moeda');
+  const erroDiv = document.getElementById('cambio-error');
+  const loadingIcon = document.getElementById('cambio-loading');
   let cambioManual = false;
 
   IMask(campoCambio, {
@@ -651,11 +648,15 @@ window.addEventListener('load', () => {
   });
 
   async function atualizarCambioAwesomeAPI() {
-    if (cambioManual) return;
+    if (cambioManual || !selectMoeda.value) return;
 
-    const moeda = selectMoeda.value; // ex: "USD-BRL"
-    const parMoeda = moeda.replace('-', ''); // ex: "USDBRL"
+    const moeda = selectMoeda.value;
+    const parMoeda = moeda.replace('-', '');
     const url = `https://economia.awesomeapi.com.br/json/last/${moeda}`;
+
+    erroDiv.textContent = '🔄 Buscando taxa de câmbio...';
+    erroDiv.style.color = '#555';
+    loadingIcon.style.display = 'inline-block';
 
     try {
       const resposta = await fetch(url);
@@ -670,25 +671,33 @@ window.addEventListener('load', () => {
       const bid = parseFloat(dados[parMoeda].bid).toFixed(4);
       campoCambio.value = bid.replace('.', ',');
       campoCambio.disabled = false;
+      erroDiv.textContent = '';
       calcular();
     } catch (erro) {
       campoCambio.disabled = false;
-      alert('⚠️ ' + erro.message + '. Por favor, digite manualmente.');
+      erroDiv.textContent = '⚠️ ' + erro.message + '. Por favor, digite a taxa manualmente.';
+      erroDiv.style.color = '#d00';
+    } finally {
+      loadingIcon.style.display = 'none';
     }
   }
 
   selectMoeda.addEventListener('change', () => {
     cambioManual = false;
+    campoCambio.value = '';
+    erroDiv.textContent = '';
     atualizarCambioAwesomeAPI();
   });
 
   campoCambio.addEventListener('input', () => {
     cambioManual = true;
     campoCambio.disabled = false;
+    erroDiv.textContent = '';
     calcular();
   });
 
-  atualizarCambioAwesomeAPI();
+  // ❌ NÃO BUSCA AUTOMATICAMENTE AO CARREGAR
+  // atualizarCambioAwesomeAPI();
 });
 
 
