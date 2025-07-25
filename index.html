@@ -640,11 +640,6 @@ window.addEventListener('load', () => {
   const selectMoeda = document.getElementById('moeda');
   let cambioManual = false;
 
-  // Variáveis para cache
-  let cacheCambio = null;
-  let cacheTimestamp = 0;
-  const CACHE_TEMPO = 300000; // 5 minutos em ms
-
   IMask(campoCambio, {
     mask: Number,
     scale: 4,
@@ -655,48 +650,36 @@ window.addEventListener('load', () => {
     min: 0,
   });
 
-  async function atualizarCambio() {
+  async function atualizarCambioAwesomeAPI() {
     if (cambioManual) return;
 
-    const agora = Date.now();
+    const moeda = selectMoeda.value; // ex: "USD-BRL"
+    const parMoeda = moeda.replace('-', ''); // ex: "USDBRL"
+    const url = `https://economia.awesomeapi.com.br/json/last/${moeda}`;
 
-    // Usa cache se estiver válido
-    if (cacheCambio && (agora - cacheTimestamp) < CACHE_TEMPO) {
-      campoCambio.value = cacheCambio;
-      calcular();
-      return;
-    }
-
-    const moeda = selectMoeda.value;
     try {
-      const resposta = await fetch(`https://economia.awesomeapi.com.br/json/last/${moeda}`);
-      if (!resposta.ok) throw new Error('Erro na resposta da API');
+      const resposta = await fetch(url);
+      if (!resposta.ok) throw new Error('Erro ao consultar a API de câmbio');
 
       const dados = await resposta.json();
-      const parMoeda = moeda.replace('-', '');
-      const bidRaw = dados[parMoeda]?.bid;
 
-      if (!bidRaw) throw new Error('Dados inválidos');
+      if (!dados[parMoeda] || !dados[parMoeda].bid) {
+        throw new Error('Cotação não disponível para esta moeda');
+      }
 
-      const bid = parseFloat(bidRaw.replace(',', '.')).toFixed(4);
-      const bidFormatado = bid.replace('.', ',');
-
-      campoCambio.value = bidFormatado;
-
-      // Atualiza cache
-      cacheCambio = bidFormatado;
-      cacheTimestamp = agora;
-
+      const bid = parseFloat(dados[parMoeda].bid).toFixed(4);
+      campoCambio.value = bid.replace('.', ',');
+      campoCambio.disabled = false;
       calcular();
     } catch (erro) {
       campoCambio.disabled = false;
-      alert('⚠️ Erro ao buscar taxa de câmbio. Por favor, digite manualmente.');
+      alert('⚠️ ' + erro.message + '. Por favor, digite manualmente.');
     }
   }
 
   selectMoeda.addEventListener('change', () => {
     cambioManual = false;
-    atualizarCambio();
+    atualizarCambioAwesomeAPI();
   });
 
   campoCambio.addEventListener('input', () => {
@@ -705,8 +688,9 @@ window.addEventListener('load', () => {
     calcular();
   });
 
-  atualizarCambio();
+  atualizarCambioAwesomeAPI();
 });
+
 
 </script>
 
