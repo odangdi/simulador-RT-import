@@ -102,11 +102,10 @@
   text-align: right;
   }
 
-table {
-  display: block;
-  width: 100%;
-  overflow-x: auto;
-    }
+table, . layout-padrao{
+overflow-x: auto;
+white-space: nowrap;
+
     border-collapse: collapse;
     margin-bottom: 1.8rem;
     background: #1c1f26;
@@ -159,6 +158,9 @@ table {
     padding-bottom: 0.25rem;
   }
 body {
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: auto; /* permite scroll horizontal em telas pequenas */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #000302 40%, #667eea 100%);
   margin: 0;
