@@ -20,225 +20,206 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/odangdi/simulador-RT-import/main/Tela%20simulador%20importação.jpg">
 <meta name="author" content="Diego D'Angelo">
 
-
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366f1',
+            secondary: '#000302',
+            accent: "white",
+            success: '#10b981',
+            warning: "white",
+            danger: '#ef4444'
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'slide-up': 'slideUp 0.3s ease-out',
+            'pulse-soft': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'bounce-soft': 'bounce 1s infinite'
+          }
+        }
+      }
+    }
+  </script>
 
 
 <style>
-    /* Reset básico e fonte */
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #fafafa;
-      margin: 0 auto;
-      padding: 10px;
-      max-width: 650px;
-      font-size: 12px;
-      color: #333;
-      line-height: 1.5;
-    }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideUp {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .gradient-bg {
+    background: linear-gradient(135deg, #000302 40%, #667eea 100%);
+  }
+  .card-hover {
+    transition: all 0.3s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  .input-glow:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+  }
+  .number-input {
+    background: linear-gradient(145deg, #f8fafc, #e2e8f0);
 
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-      margin-bottom: 1.5rem;
-      font-weight: 700;
-      font-size: 2rem;
-    }
+  }
 
-    h2 {
-      margin-top: 3rem;
-      margin-bottom: 1rem;
-      font-size: 1.25rem;
-      color: #34495e;
-      border-bottom: 2px solid #2980b9;
-      padding-bottom: 0.25rem;
-    }
-
-    /* Tabela estilizada */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1.8rem;
-      background: #fff;
-      box-shadow: 0 2px 5px rgb(0 0 0 / 0.05);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    thead tr {
-      background: #2980b9;
-      color: #fff;
-      font-weight: 600;
-      text-align: center;
-      user-select: none;
-    }
-
-    td, th {
-      padding: 3px 4px;
-      border-bottom: 1px solid #ddd;
-      vertical-align: middle;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-
-    th.left, td.left {
-      text-align: left;
-    }
-
-    /* Última linha sem borda inferior */
-    tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    /* Inputs */
-    input[type="number"], input[type="text"], select {
-      width: 100%;
-      padding: 6px 10px;
-      border: 1.5px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
-      font-family: inherit;
-      transition: border-color 0.2s ease-in-out;
-      text-align: right;
-      box-sizing: border-box;
-    }
-    input.taxa {
-      text-align: right;
-    }
-
-    input[type="number"]:focus,
-    input[type="text"]:focus,
-    select:focus {
-      outline: none;
-      border-color: #2980b9;
-      box-shadow: 0 0 4px rgba(41, 128, 185, 0.4);
-    }
-
-    /* Campos somente leitura com estilo */
-    input[readonly] {
-      background-color: #f3f3f3;
-      color: #666;
-      cursor: not-allowed;
-      text-align: center;
-    }
-
-    /* Linhas em destaque */
-    tr.bold {
-      font-weight: 700;
-      background-color: #eaf3fc;
-    }
-    tr.bold.highlight {
-      background-color: #fde5d9;
-    }
-
-    /* Alinhamento e margens no select */
-    #moeda {
-      max-width: 220px;
-      margin-left: 0;
-      display: block;
-      text-align: left;
-    }
-
-    /* Responsividade simples */
-  @media (max-width: 650px) {
-    td {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 10px;
-      border-bottom: 1px solid #eee;
-      position: relative;
-    }
-      h1 {
-        font-size: 1.5rem;
-      }
-      table, thead, tbody, th, td, tr {
-        display: block;
-        width: 100%;
-      }
-      thead tr {
-        display: none;
-      }
-      tr {
-        margin-bottom: 1rem;
-        border-radius: 8px;
-        box-shadow: 0 1px 4px rgb(0 0 0 / 0.1);
-        background: white;
-        padding: 8px;
-      }
-      td {
-        text-align: right;
-        padding-left: flex;
-        position: relative;
-        border: none;
-        border-bottom: 1px solid #eee;
-      }
-      td.left {
-        text-align: left;
-      }
-  td[data-label]::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 10px;
-    width: 45%;
-    white-space: nowrap;
-    font-weight: bold;
-    color: #666;
+  input[type="text"], input[type="number"], select {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.75rem;
+    padding: 0.1rem 0.1rem;
+    width: 100%;
+    font-size: 1rem;
+    max-width: 100%;
+    box-sizing: border-box;
     text-align: left;
   }
-      /* Labels dos dados - você pode personalizar para cada tabela via JS ou manual */
-      table:nth-of-type(1) td:nth-of-type(1)::before { content: " "; }
-      table:nth-of-type(1) td:nth-of-type(2)::before { content: "Dados do produto: "; }
-      table:nth-of-type(1) td:nth-of-type(3)::before { content: "Total"; }
-      table:nth-of-type(1) td:nth-of-type(4)::before { content: "Vl R$"; }
-      table:nth-of-type(1) td:nth-of-type(5)::before { content: "Total R$"; }
-    }
+  input[readonly], input[readonly]:focus {
+    background-color: #1c1f26 !important;
+    color: #fff !important;
+    border: none;
+    text-align: right;
+  }
+  input[readonly]::placeholder {
+    color: #fff !important;
+    text-align: right;
+  }
+  input[id] {
+  text-align: right;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.8rem;
+    background: #1c1f26;
+    border-radius: 8px;
+    overflow: hidden;
+    color: white;
 
-    .moeda-cambio-cell {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: flex-start;
-    }
-    #moeda, #cambio {
-      width: 150px;
-      text-align: left;
-      padding: 1px;
-    }
+  }
+  thead tr {
+    background: #6366f1;
+    color: #fff;
+    text-align: center;
+  }
+  td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #444;
+    vertical-align: middle;
+    text-align: right;
+    color: black;
+  }
+  th {
+    padding: 6px 10px;
+    border-bottom: 1px solid #444;
+    vertical-align: middle;
+    text-align: right;
+    color: #fff;
+    font-size: 12px;
+  }
+  th.left, td.left {
+    text-align: left;
+  }
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+  h1 {
+    text-align: center;
+    color: white;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    font-size: 2rem;
+  }
+  h2 {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    color: #f5f5f5;
+    border-bottom: 2px solid #6366f1;
+    padding-bottom: 0.25rem;
+  }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #000302 40%, #667eea 100%);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 11px;
+  color: #fff;
+  line-height: 1.5;
+}
+</style>
 
-IMask(campoCambio, {
-  mask: Number,
-  scale: 4,
-  thousandsSeparator: '.',
-  radix: ',',
-  padFractionalZeros: true,
-  normalizeZeros: true,
-  min: 0,
-});
-
-
-	
-  </style>
 </head>
 <body>
 
 
+<body class="min-h-screen gradient-bg p-4">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8 animate-fade-in">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4 backdrop-blur-sm">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+        </svg>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">
+        SIMULADOR DI IMPORTAÇÃO
+      </h1>
+      <p class="text-white/80 text-lg">Cálculo de Impostos - Reforma Tributária</p>
+    </div>
 
-  <h1>SIMULADOR DI IMPORTAÇÃO</h1>
-  <h2>Reforma Tributária</h2>
+
+<!-- Info Card -->
+    <div class="glass-effect rounded-2xl p-6 mb-8 animate-slide-up">
+      <div class="flex items-start space-x-4">
+        <div class="flex-shrink-0">
+          <div class="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center">
+            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold mb-1">Sobre esta ferramenta</h3>
+          <p class="text-white/80 text-0.65 leading-relaxed">
+            Esta ferramenta realiza a simulação detalhada dos tributos incidentes em operações de IMPORTAÇÃO COMERCIAL COM DI, considerando tanto a estrutura tributária atual quanto os novos impostos previstos na Reforma Tributária de 2026, como IBS, CBS e IS. Ideal para empresas que desejam antecipar os impactos fiscais e planejar com precisão suas operações.
+          </p>
+        </div>
+      </div>
+    </div>
+
 
 <p style="font-size: 11px;">
-<em>Esta ferramenta realiza a simulação detalhada dos tributos incidentes em operações de IMPORTAÇÃO COMERCIAL COM DI, considerando tanto a estrutura tributária atual quanto os novos impostos previstos na Reforma Tributária de 2026, como IBS, CBS e IS. Ideal para empresas que desejam antecipar os impactos fiscais e planejar com precisão suas operações.</em></p>
+<strong>- A exemplo de Declaração de Importação (DI), preencha os dados e os percentuais dos impostos:</strong></p><br>
 
-<p style="font-size: 11px;">
-<strong>- A exemplo de Declaração de Importação (DI), preencha os dados e os percentuais dos impostos:</strong></p>
+
+<footer class="glass-effect rounded-2xl p-6 mt-8 text-left animate-fade-in text-white text-sm space-y-4">
+
 
      <!-- Seção Moeda e Câmbio -->
     <section aria-labelledby="sec-cambio">
-      <h2 id="sec-cambio" data-i18n="currency_and_rate">CONVERSÃO</h2>
+      <h2 class="text-xl font-bold text-white">CONVERSÃO</h2>
+      
       <fieldset>
         <legend class="sr-only" data-i18n="currency_and_rate">Selecione</legend>
 
@@ -264,7 +245,7 @@ IMask(campoCambio, {
         </div>
 
         <div class="form-group">
-          <label for="cambio" data-i18n="exchange_rate">Taxa de câmbio</label>
+          <label for="cambio" data-i18n="exchange_rate">Taxa de câmbio (informe)</label>
           <div class="input-with-icon">
             <input type="text" id="cambio" name="cambio" inputmode="decimal" required aria-describedby="cambio-error"
             />
@@ -272,10 +253,12 @@ IMask(campoCambio, {
           </div>
           <div id="cambio-error" class="error-message" role="alert"></div>
         </div>
+
       </fieldset>
     </section>
+<br>
 
-  <h2>COMPOSIÇÃO</h2>
+<h2 class="text-xl font-bold text-white">COMPOSIÇÃO</h2>
   <table>
     <thead>
       <tr>
@@ -288,55 +271,55 @@ IMask(campoCambio, {
     </thead>
     <tbody>
 <tr>
-  <td class="left">Quantidade</td>
-  <td data-label="Quantidade">
+  <th class="left">Quantidade</td>
+  <td data-label="Quantidade" >
   <input id="quantidade" class="taxa" value="10,000" min="0,001" step="any" aria-label="Quantidade" />
   </td>
 
 <!-- Faça o mesmo para cada <td> que representa um campo de dados visível em telas menores -->
 <tr>
-  <td class="left">Vl Unit. FOB ($)</td>
+  <th class="left">Vl Unit. FOB ($)</th>
   <td data-label="Vl Produto FOB ($)"><input id="fob" class="taxa" value="27,758" aria-label="Valor FOB em moeda estrangeira" /></td>
-  <td data-label="Total" id="totalFOB"></td>
-  <td data-label="Vl R$" id="vlFOB"></td>
-  <td data-label="Total R$" id="totalFOBR"></td>
+  <th data-label="Total" id="totalFOB"></th>
+  <th data-label="Vl R$" id="vlFOB"></th>
+  <th data-label="Total R$" id="totalFOBR"></th>
 </tr>
 
 <tr>
-  <td class="left">Frete internacional ($)</td>
+  <th class="left">Frete internacional ($)</td>
 
   <td data-label="Frete internacional ($)"><input id="frete" class="taxa" value="1,02" aria-label="Frete internacional" /></td>
-  <td data-label="Total"></td>
-  <td data-label="Vl R$" id="vlFrete"></td>
-  <td data-label="Total R$" id="totalFreteR"></td>
+  <th data-label="Total"></th>
+  <th data-label="Vl R$" id="vlFrete"></th>
+  <th data-label="Total R$" id="totalFreteR"></th>
 </tr>
 <tr>
-  <td class="left">Seguro internacional ($)</td>
+  <th class="left">Seguro internacional ($)</th>
   <td data-label="Seguro internacional ($)"><input id="seguro" class="taxa" value="0,00" aria-label="Seguro internacional" /></td>
-  <td data-label="Total"></td>
-  <td data-label="Vl R$" id="vlSeguro"></td>
-  <td data-label="Total R$" id="totalSeguroR"></td>
+  <th data-label="Total"></th>
+  <th data-label="Vl R$" id="vlSeguro"></th>
+  <th data-label="Total R$" id="totalSeguroR"></th>
 </tr>
       <tr class="bold">
-        <td class="left">TOTAL ADUANEIRO (R$)</td>
-        <td colspan="4" id="va"></td>
+        <th class="left">TOTAL ADUANEIRO (R$)</th>
+        <th colspan="4" id="va"></th>
 
       </tr>
 <tr>
-  <td class="left">Acrescimos (capatazia) (R$)</td>
+  <th class="left">Acrescimos (capatazia) (R$)</td>
   <td colspan="4" data-label="Acrescimos (capatazia) (R$)">
     <input id="capatazia" class="taxa" value="8,82" aria-label="Acrescimos capatazia" />
   </td>
 </tr>
       <tr class="bold">
-        <td class="left">TOTAL ADUANEIRO CIF (R$)</td>
-        <td colspan="4" id="cif"></td>
+        <th class="left">TOTAL ADUANEIRO CIF (R$)</th>
+        <th colspan="4" id="cif"></th>
       </tr>
     </tbody>
   </table>
 
 
-  <h2>ENCARGOS ADUANEIROS (R$)</h2>
+<h2 class="text-xl font-bold text-white">ENCARGOS ADUANEIROS (R$)</h2>
   <table>
     <thead>
       <tr>
@@ -348,82 +331,82 @@ IMask(campoCambio, {
     </thead>
     <tbody>
 <tr>
-  <td class="left">Imposto de Importação (II)</td>
-  <td data-label="Base" id="baseII"></td>
+  <th class="left">Imposto de Importação (II)</th>
+  <th data-label="Base" id="baseII"></th>
   <td data-label="Taxa (%)"><input id="taxaII" class="taxa" value="14,40" aria-label="Taxa Imposto de Importação" /></td>
-  <td data-label="Total R$" id="totalII"></td>
+  <th data-label="Total R$" id="totalII"></th>
 </tr>
 <tr>
-  <td class="left">IPI</td>
-  <td data-label="Base" id="baseIPI"></td>
+  <th class="left">IPI</td>
+  <th data-label="Base" id="baseIPI"></th>
   <td data-label="Taxa (%)"><input id="taxaIPI" class="taxa" value="0,00" aria-label="Taxa IPI" /></td>
-  <td data-label="Total R$" id="totalIPI"></td>
+  <th data-label="Total R$" id="totalIPI"></th>
 </tr>
 <tr>
-  <td class="left">PIS</td>
-  <td data-label="Base" id="basePIS"></td>
+  <th class="left">PIS</td>
+  <th data-label="Base" id="basePIS"></th>
   <td data-label="Taxa (%)"><input id="taxaPIS" class="taxa" value="0,00" aria-label="Taxa PIS" /></td>
-  <td data-label="Total R$" id="totalPIS"></td>
+  <th data-label="Total R$" id="totalPIS"></th>
 </tr>
 <tr>
-  <td class="left">COFINS</td>
-  <td data-label="Base" id="baseCOFINS"></td>
+  <th class="left">COFINS</td>
+  <th data-label="Base" id="baseCOFINS"></th>
   <td data-label="Taxa (%)"><input id="taxaCOFINS" class="taxa" value="0,00" aria-label="Taxa COFINS" /></td>
-  <td data-label="Total R$" id="totalCOFINS"></td>
+  <th data-label="Total R$" id="totalCOFINS"></th>
 </tr>
 <tr>
-  <td class="left">IS-Imposto Seletivo (ad valorem)</td>
-  <td data-label="Base" id="baseIS1"></td>
+  <th class="left">IS-Imposto Seletivo (ad valorem)</td>
+  <th data-label="Base" id="baseIS1"></th>
   <td data-label="Taxa (%)"><input id="taxaIS1" class="taxa" value="0,00" readonly aria-label="Taxa Imposto Seletivo 1" /></td>
-  <td data-label="Total R$" id="totalIS1"></td>
+  <th data-label="Total R$" id="totalIS1"></th>
 </tr>
 
 <tr>
-  <td class="left">Taxa Siscomex</td>
+  <th class="left">Taxa Siscomex</th>
   <td colspan="2"></td>
   <td data-label="Total R$"><input id="totalSiscomex" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Taxa Siscomex" /></td>
 </tr>
 <tr>
-  <td class="left">AFRMM</td>
+  <th class="left">AFRMM</td>
   <td colspan="2"></td>
   <td data-label="Total R$"><input id="totalAFRMM" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total AFRMM" /></td>
 </tr>
 <tr>
-  <td class="left">CIDE-Combustíveis</td>
+  <th class="left">CIDE-Combustíveis</th>
   <td colspan="2"></td>
   <td data-label="Total R$"><input id="totalCIDE" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total CIDE-Combustíveis" /></td>
 </tr>
 <tr>
-  <td class="left">Antidumping</td>
+  <th class="left">Antidumping</th>
   <td colspan="2"></td>
   <td data-label="Total R$"><input id="totalAntidumping" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Antidumping" /></td>
 </tr>
 <tr>
-  <td class="left">Compensatórios</td>
+  <th class="left">Compensatórios</th>
   <td colspan="2"></td>
   <td data-label="Total R$"><input id="totalCompensatorios" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Compensatórios" /></td>
 </tr>
 <tr>
-  <td class="left">Salvaguardas</td>
+  <th class="left">Salvaguardas</th>
   <td colspan="2"></td>
   <td data-label="Total R$"><input id="totalSalvaguardas" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Salvaguardas" /></td>
 </tr>
 <tr>
-  <td class="left">Outros tributos</td>
+  <th class="left">Outros tributos</th>
   <td colspan="2"></td>
   <td data-label="Total R$"><input id="totalOutros" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Outros Tributos" /></td>
 </tr>	
 
       <tr class="bold">
-        <td class="left">TOTAL ADUANEIRO EM REAIS R$ = VL Aduaneiro CIF + ENCARGOS - IS </td>
-        <td colspan="3" id="totalEncargos"></td>
+        <th class="left">TOTAL ADUANEIRO EM REAIS R$ = VL Aduaneiro CIF + ENCARGOS - IS </th>
+        <th colspan="3" id="totalEncargos"></th>
       </tr>
      
     </tbody>
 
   </table>
 
-  <h2>BASE DE CÁLCULO DO ICMS</h2>
+<h2 class="text-xl font-bold text-white">BASE DE CÁLCULO DO ICMS</h2>
   <table>
     <thead>
       <tr>
@@ -436,16 +419,16 @@ IMask(campoCambio, {
     </thead>
     <tbody>
      <tr>
-  <td class="left">ICMS</td>
-  <td data-label="Base" id="baseICMS"></td>
+  <th class="left">ICMS</td>
+  <th data-label="Base" id="baseICMS"></th>
   <td data-label="Taxa (%)"><input id="taxaICMS" class="taxa" value="18,00" aria-label="Taxa ICMS" /></td>
-  <td data-label="Fator" id="fatorICMS"></td>
-  <td data-label="Total ICMS" id="totalICMS"></td>
+  <th data-label="Fator" id="fatorICMS"></th>
+  <th data-label="Total ICMS" id="totalICMS"></th>
 </tr>
     </tbody>
   </table>
 
-  <h2>BASE DE CÁLCULO DO IBS/CBS/IS</h2>
+<h2 class="text-xl font-bold text-white">BASE DE CÁLCULO DO IBS/CBS/IS</h2>
   <table>
     <thead>
       <tr>
@@ -457,40 +440,42 @@ IMask(campoCambio, {
     </thead>
     <tbody>
    <tr>
-  <td class="left">IBS Municial (Base art. 65 LC 214/25)</td>
-  <td data-label="Base" id="baseIBSM"></td>
+  <th class="left">IBS Municial (Base art. 65 LC 214/25)</td>
+  <th data-label="Base" id="baseIBSM"></th>
   <td data-label="Taxa (%)"><input id="taxaIBSM" class="taxa" value="0,00" aria-label="Taxa IBS Municipal" /></td>
-  <td data-label="Total R$" id="totalIBSM"></td>
+  <th data-label="Total R$" id="totalIBSM"></th>
 </tr>
 <tr>
-  <td class="left">IBS Estadual (Base art. 65 LC 214/25)</td>
-  <td data-label="Base" id="baseIBSE"></td>
+  <th class="left">IBS Estadual (Base art. 65 LC 214/25)</td>
+  <th data-label="Base" id="baseIBSE"></th>
   <td data-label="Taxa (%)"><input id="taxaIBSE" class="taxa" value="0,10" aria-label="Taxa IBS Estadual" /></td>
-  <td data-label="Total R$" id="totalIBSE"></td>
+  <th data-label="Total R$" id="totalIBSE"></th>
 </tr>
 <tr>
-  <td class="left">CBS (Base art. 65 LC 214/25)</td>
-  <td data-label="Base" id="baseCBS"></td>
+  <th class="left">CBS (Base art. 65 LC 214/25)</td>
+  <th data-label="Base" id="baseCBS"></th>
   <td data-label="Taxa (%)"><input id="taxaCBS" class="taxa" value="0,90" aria-label="Taxa CBS" /></td>
-  <td data-label="Total R$" id="totalCBS"></td>
+  <th data-label="Total R$" id="totalCBS"></th>
 </tr>
 <tr>
-  <td class="left">IS-Imposto Seletivo (Base art. 434 LC 214/25)</td>
-  <td data-label="Base" id="baseIS2"></td>
+  <th class="left">IS-Imposto Seletivo (Base art. 434 LC 214/25)</td>
+  <th data-label="Base" id="baseIS2"></th>
   <td data-label="Taxa (%)"><input id="taxaIS2" class="taxa" value="0,00" aria-label="Taxa Imposto Seletivo 2" /></td>
-  <td data-label="Total R$" id="totalIS2"></td>
+  <th data-label="Total R$" id="totalIS2"></th>
 </tr>
 
       <tr class="bold">
-        <td class="left">TOTAL DOS IMPOSTOS RT</td>
-        <td colspan="3" id="totalRT"></td>
+        <th class="left">TOTAL DOS IMPOSTOS RT</th>
+        <th colspan="3" id="totalRT"></th>
       </tr>
      
     </tbody>
   </table>
 
 
- <h2>TOTAL</h2>
+
+<h2 class="text-xl font-bold text-white">TOTAL</h2>
+
   <table>
     <thead>
 
@@ -501,13 +486,13 @@ IMask(campoCambio, {
         <th></th>
   </thead>
         <tr class="bold">
-        <td class="left">VALOR TOTAL DO PRODUTO</td>
-        <td colspan="3" id="totalprodutos"></td>
+        <th class="left">VALOR TOTAL DO PRODUTO</th>
+        <th colspan="3" id="totalprodutos"></th>
       </tr>
 
         <tr class="bold">
-        <td class="left">VALOR TOTAL DA NOTA FISCAL</td>
-        <td colspan="3" id="totalNF"></td>
+        <th class="left">VALOR TOTAL DA NOTA FISCAL</th>
+        <th colspan="3" id="totalNF"></th>
       </tr>  
 
 
@@ -705,40 +690,80 @@ window.addEventListener('load', () => {
 
 
 
-  <footer class="footer">
-
-    <a href="https://forms.gle/FgHaFehB74mNmxH98" target="_blank">De seu feedback, avalie este conteúdo &#10004</a><p>
-    <h3><strong>e-book's &#128217 de estudos Fiscais na Amazon:</strong></h3>
-    <a href="https://www.amazon.com.br/dp/B0FB4BDH8V" target="_blank">■ CRÉDITOS DE IBS e CBS: uso e consumo pessoal</a><br>
-    <a href="https://www.amazon.com.br/dp/B0DHGB27K2" target="_blank">■ EXCLUSÃO ICMS DA BASE PIS E COFINS: formação do preço</a><br>
- </footer>
 
 
 
 
-<br>
-<footer class="footer">
+<!-- Footer -->
 
-    Simulador desenvolvido com base na Lei Complementar nº 214, de 16/01/2025 e legislação anterior.<br>
-    &copy; 2025 Diego D'angelo. Licenciado sob 
-    <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a><br><br>
-    Me siga no LinkedIn – 
-    <a href="https://www.linkedin.com/in/diegodangelo-di-ryco/" target="_blank">Diego Dangelo</a>
-    <a href="https://www.linkedin.com/in/diegodangelo-di-ryco/" target="_blank" style="text-decoration: none;">
-      <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" loading="lazy" alt="LinkedIn" width="30" height="30" style="vertical-align: middle;">
+
+    <footer style="background: rgba(0,0,0,0.2); color: white; padding: 30px 20px; margin-top: 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1);">
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; gap: 20px;">
+
+  <!-- Título e descrição -->
+  <div class="flex items-center justify-center space-x-2">
+    <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <span class="text-white/80">Simulador DI Importação - Reforma Tributária</span>
+  </div>
+
+
+
+  <!-- Feedback -->
+  <div>
+    <a href="https://forms.gle/FgHaFehB74mNmxH98" target="_blank" class="text-teal-300 hover:underline">
+      ✅ Dê seu feedback sobre este conteúdo
     </a>
+  </div>
 
-  </footer>
 
-<button onclick="compartilhar()">🔗 Compartilhe esta página</button>
+  <!-- eBooks Amazon -->
+  <div>
+    <h3 class="font-semibold">📚 eBooks de Estudos Fiscais na Amazon:</h3>
+    <a href="https://www.amazon.com.br/dp/B0FB4BDH8V" target="_blank" class="block text-blue-300 hover:underline">
+      ■ CRÉDITOS DE IBS e CBS: uso e consumo pessoal
+    </a>
+    <a href="https://www.amazon.com.br/dp/B0DHGB27K2" target="_blank" class="block text-blue-300 hover:underline">
+      ■ EXCLUSÃO ICMS DA BASE PIS E COFINS: formação do preço de venda
+    </a>
+  </div>
+
+  <!-- Informações legais -->
+  <div class="text-white/60 text-xs">
+    Simulador desenvolvido para auxiliar no cálculo de impostos da Reforma Tributária com base na Lei Complementar nº 214, de 16/01/2025 e legislação anterior.<br>
+    &copy; 2025 Diego D'Angelo. Licenciado sob
+    <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" class="text-white/70 underline">
+      CC BY 4.0
+    </a>
+  </div>
+
+  <!-- LinkedIn -->
+  <div>
+    Me siga no LinkedIn –
+    <a href="https://www.linkedin.com/in/diegodangelo-di-ryco/" target="_blank" class="text-sky-400 hover:underline">
+      Diego D'Angelo
+    </a>
+    <a href="https://www.linkedin.com/in/diegodangelo-di-ryco/" target="_blank" class="inline-block ml-1">
+      <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" width="20" height="20" class="inline-block align-middle">
+    </a>
+  </div>
+
+  <!-- Botão de Compartilhar -->
+  <button onclick="compartilhar()" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-md transition">
+    🔗 Compartilhar esta página
+  </button>
+
+</footer>
 
 <script>
 function compartilhar() {
   if (navigator.share) {
     navigator.share({
       title: 'Simulador DI Importação',
-      text: 'Confira este simulador de impostos baseado na Reforma Tributária!',
-      url: 'https://odangdi.github.io/simulador-rt2026/',
+      text: 'Confira este simulador de importação baseado na Reforma Tributária!',
+      url: 'https://odangdi.github.io/simulador-RT-import/',
     })
     .then(() => console.log('Compartilhado com sucesso'))
     .catch((error) => console.log('Erro ao compartilhar:', error));
@@ -746,6 +771,7 @@ function compartilhar() {
     alert('Compartilhamento não suportado neste navegador. Copie o link manualmente:\n\nhttps://odangdi.github.io/simulador-RT-import/');
   }
 }
+
 </script>
 
 
