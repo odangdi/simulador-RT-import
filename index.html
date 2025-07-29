@@ -105,15 +105,23 @@
   }
   table {
     width: 100%;
+  display: block;
+  overflow-x: auto;
+    }
     border-collapse: collapse;
     margin-bottom: 1.8rem;
     background: #1c1f26;
     border-radius: 8px;
     overflow: hidden;
     color: white;
-
   }
-  thead tr {
+  thead tr {@media (max-width: 640px) {
+  h1 {
+    font-size: 1.25rem;
+  }
+  input[type="text"], input[type="number"], select {
+    font-size: 0.875rem;
+  }
     background: #6366f1;
     color: #fff;
     text-align: center;
