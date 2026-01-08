@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=0.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2980b9">
   <link rel="icon" href="icon.png">
@@ -177,7 +178,6 @@ body {
 </style>
 
 </head>
-<body>
 
   
 
@@ -622,6 +622,108 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
 
       document.getElementById('totalNF').textContent = totalNF.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     }
+
+// ✅ Auto-recalcular: quando qualquer campo mudar, recalcula tudo.
+  function ativarAutoRecalculo() {
+    const seletorCampos = 'input, select, textarea';
+
+    // Debounce leve pra não recalcular a cada tecla muito rápido
+    let t = null;
+    const recalcularComDebounce = () => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        try { calcular(); } catch (e) { /* evita travar */ }
+      }, 80);
+    };
+
+    document.querySelectorAll(seletorCampos).forEach(el => {
+      // Evita duplicar listeners se chamar de novo
+      if (el.dataset.autoCalc === "1") return;
+      el.dataset.autoCalc = "1";
+
+      el.addEventListener('input', recalcularComDebounce);
+      el.addEventListener('change', recalcularComDebounce);
+    });
+
+    // Calcula ao abrir (para preencher as tabelas)
+    recalcularComDebounce();
+  }
+
+  // Ativa assim que o DOM estiver pronto (inputs já existem)
+  document.addEventListener('DOMContentLoaded', ativarAutoRecalculo);
+
+  window.addEventListener('load', () => {
+    const campoCambio = document.getElementById('cambio');
+    const selectMoeda = document.getElementById('moeda');
+    const erroDiv = document.getElementById('cambio-error');
+    const loadingIcon = document.getElementById('cambio-loading');
+    let cambioManual = false;
+
+    IMask(campoCambio, {
+      mask: Number,
+      scale: 4,
+      thousandsSeparator: '.',
+      radix: ',',
+      padFractionalZeros: true,
+      normalizeZeros: true,
+      min: 0,
+    });
+
+    async function atualizarCambioAwesomeAPI() {
+      if (cambioManual || !selectMoeda.value) return;
+
+      const moeda = selectMoeda.value;
+      const parMoeda = moeda.replace('-', '');
+      const url = `https://economia.awesomeapi.com.br/json/last/${moeda}`;
+
+      erroDiv.textContent = '🔄 Buscando taxa de câmbio...';
+      erroDiv.style.color = '#555';
+      loadingIcon.style.display = 'inline-block';
+
+      try {
+        const resposta = await fetch(url);
+        if (!resposta.ok) throw new Error('Erro ao consultar a API de câmbio');
+
+        const dados = await resposta.json();
+
+        if (!dados[parMoeda] || !dados[parMoeda].bid) {
+          throw new Error('Cotação não disponível para esta moeda');
+        }
+
+        const bid = parseFloat(dados[parMoeda].bid).toFixed(4);
+        campoCambio.value = bid.replace('.', ',');
+        campoCambio.disabled = false;
+        erroDiv.textContent = '';
+
+        calcular(); // ✅ recalcula ao atualizar câmbio
+      } catch (erro) {
+        campoCambio.disabled = false;
+        erroDiv.textContent = '⚠️ ' + erro.message + '. Por favor, digite a taxa manualmente.';
+        erroDiv.style.color = '#d00';
+      } finally {
+        loadingIcon.style.display = 'none';
+      }
+    }
+
+    selectMoeda.addEventListener('change', () => {
+      cambioManual = false;
+      campoCambio.value = '';
+      erroDiv.textContent = '';
+      atualizarCambioAwesomeAPI();
+
+      calcular(); // ✅ garante recálculo se a moeda mudar
+    });
+
+    campoCambio.addEventListener('input', () => {
+      cambioManual = true;
+      campoCambio.disabled = false;
+      erroDiv.textContent = '';
+      calcular();
+    });
+  });
+</script>
+
+<script>
 
 window.addEventListener('load', () => {
   const campoCambio = document.getElementById('cambio');
