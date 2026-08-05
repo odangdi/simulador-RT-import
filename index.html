@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://odangdi.github.io/simulador-RT-import/">
 <meta property="og:title" content="Simulador DI Importação - Reforma Tributária">
-<meta property="og:description" content="Esta ferramenta realiza a simulação detalhada dos tributos incidentes em operações de importação comercial com DI, considerando tanto a estrutura tributária atual quanto os novos impostos previstos na Reforma Tributária de 2026, como IBS, CBS e IS. Ideal para empresas que desejam antecipar os impactos fiscais e planejar com precisão suas operações.">
+<meta property="og:description" content="Esta ferramenta realiza a simulação detalhada dos tributos incidentes em operações de importação comercial com DI, considerando tanto a estrutura tributária atual quanto os novos impostos previstos na Reforma Tributária de 2026/2027, como IBS, CBS e IS. Ideal para empresas que desejam antecipar os impactos fiscais e planejar com precisão suas operações.">
 <meta property="og:image" content="https://raw.githubusercontent.com/odangdi/simulador-RT-import/main/Tela%20simulador%20importação.jpg">
 <meta name="author" content="Diego D'Angelo">
 
@@ -210,7 +210,7 @@ body {
         <div>
           <h3 class="text-white font-semibold mb-1">Sobre esta ferramenta</h3>
           <p class="text-white/80 text-0.65 leading-relaxed">
-            Esta ferramenta realiza a simulação detalhada dos tributos incidentes em operações de IMPORTAÇÃO COMERCIAL COM DI, considerando tanto a estrutura tributária atual quanto os novos impostos previstos na Reforma Tributária de 2026, como IBS, CBS e IS. Ideal para empresas que desejam antecipar os impactos fiscais e planejar com precisão suas operações.
+            Esta ferramenta realiza a simulação detalhada dos tributos incidentes em operações de IMPORTAÇÃO COMERCIAL COM DI, considerando tanto a estrutura tributária atual quanto os novos impostos previstos na Reforma Tributária de 2026/2027. Nesta Versão o IBS e CBS não estão compondo a base de calculo do ICMS. Ideal para empresas que desejam antecipar os impactos fiscais e planejar com precisão suas operações.
           </p>
         </div>
       </div>
@@ -218,7 +218,7 @@ body {
 
 
 <p style="font-size: 11px;">
-<strong>- A exemplo de Declaração de Importação (DI), preencha os dados e os percentuais dos impostos:</strong></p><br>
+<strong>- A exemplo de Declaração de Importação (DI), preencha os dados e os percentuais dos impostos. Caso ocorra falha ao selecionar a Moeda, informe a taxa manualmente</strong></p><br>
 
 
 <footer class="glass-effect rounded-2xl p-6 mt-8 text-left animate-fade-in text-white text-sm space-y-4">
@@ -253,7 +253,7 @@ body {
         </div>
 
         <div class="form-group">
-          <label for="cambio" data-i18n="exchange_rate">Taxa de câmbio (informe)</label>
+          <label for="cambio" data-i18n="exchange_rate">Taxa de câmbio (informe aqui)</label>
           <div class="input-with-icon">
             <input type="text" id="cambio" name="cambio" inputmode="decimal" required aria-describedby="cambio-error"
             />
@@ -281,13 +281,13 @@ body {
 <tr>
   <th class="left">Quantidade</td>
   <td data-label="Quantidade" >
-  <input id="quantidade" class="taxa" value="10,000" min="0,001" step="any" aria-label="Quantidade" />
+  <input id="quantidade" class="taxa" value="100,000" min="0,001" step="any" aria-label="Quantidade" />
   </td>
 
 <!-- Faça o mesmo para cada <td> que representa um campo de dados visível em telas menores -->
 <tr>
   <th class="left">Vl Unit. FOB ($)</th>
-  <td data-label="Vl Produto FOB ($)"><input id="fob" class="taxa" value="27,758" aria-label="Valor FOB em moeda estrangeira" /></td>
+  <td data-label="Vl Produto FOB ($)"><input id="fob" class="taxa" value="9,449902" aria-label="Valor FOB em moeda estrangeira" /></td>
   <th data-label="Total" id="totalFOB"></th>
   <th data-label="Vl R$" id="vlFOB"></th>
   <th data-label="Total R$" id="totalFOBR"></th>
@@ -296,7 +296,7 @@ body {
 <tr>
   <th class="left">Frete internacional ($)</td>
 
-  <td data-label="Frete internacional ($)"><input id="frete" class="taxa" value="1,02" aria-label="Frete internacional" /></td>
+  <td data-label="Frete internacional ($)"><input id="frete" class="taxa" value="256,32" aria-label="Frete internacional" /></td>
   <th data-label="Total"></th>
   <th data-label="Vl R$" id="vlFrete"></th>
   <th data-label="Total R$" id="totalFreteR"></th>
@@ -316,7 +316,7 @@ body {
 <tr>
   <th class="left">Acrescimos (capatazia) (R$)</td>
   <td colspan="4" data-label="Acrescimos (capatazia) (R$)">
-    <input id="capatazia" class="taxa" value="8,82" aria-label="Acrescimos capatazia" />
+    <input id="capatazia" class="taxa" value="0,00" aria-label="Acrescimos capatazia" />
   </td>
 </tr>
       <tr class="bold">
@@ -341,25 +341,25 @@ body {
 <tr>
   <th class="left">Imposto de Importação (II)</th>
   <th data-label="Base" id="baseII"></th>
-  <td data-label="Taxa (%)"><input id="taxaII" class="taxa" value="14,40" aria-label="Taxa Imposto de Importação" /></td>
+  <td data-label="Taxa (%)"><input id="taxaII" class="taxa" value="16,00" aria-label="Taxa Imposto de Importação" /></td>
   <th data-label="Total R$" id="totalII"></th>
 </tr>
 <tr>
   <th class="left">IPI</td>
   <th data-label="Base" id="baseIPI"></th>
-  <td data-label="Taxa (%)"><input id="taxaIPI" class="taxa" value="0,00" aria-label="Taxa IPI" /></td>
+  <td data-label="Taxa (%)"><input id="taxaIPI" class="taxa" value="9,75" aria-label="Taxa IPI" /></td>
   <th data-label="Total R$" id="totalIPI"></th>
 </tr>
 <tr>
   <th class="left">PIS</td>
   <th data-label="Base" id="basePIS"></th>
-  <td data-label="Taxa (%)"><input id="taxaPIS" class="taxa" value="0,00" aria-label="Taxa PIS" /></td>
+  <td data-label="Taxa (%)"><input id="taxaPIS" class="taxa" value="2,10" aria-label="Taxa PIS" /></td>
   <th data-label="Total R$" id="totalPIS"></th>
 </tr>
 <tr>
   <th class="left">COFINS</td>
   <th data-label="Base" id="baseCOFINS"></th>
-  <td data-label="Taxa (%)"><input id="taxaCOFINS" class="taxa" value="0,00" aria-label="Taxa COFINS" /></td>
+  <td data-label="Taxa (%)"><input id="taxaCOFINS" class="taxa" value="9,65" aria-label="Taxa COFINS" /></td>
   <th data-label="Total R$" id="totalCOFINS"></th>
 </tr>
 <tr>
@@ -372,7 +372,7 @@ body {
 <tr>
   <th class="left">Taxa Siscomex</th>
   <td colspan="2"></td>
-  <td data-label="Total R$"><input id="totalSiscomex" class="taxa" value="0,00" oninput="calcularTotal()" aria-label="Total Taxa Siscomex" /></td>
+  <td data-label="Total R$"><input id="totalSiscomex" class="taxa" value="154,23" oninput="calcularTotal()" aria-label="Total Taxa Siscomex" /></td>
 </tr>
 <tr>
   <th class="left">AFRMM</td>
@@ -494,12 +494,19 @@ body {
         <th></th>
   </thead>
         <tr class="bold">
-        <th class="left">VALOR TOTAL DO PRODUTO</th>
+        <th class="left">VALOR TOTAL DO PRODUTO CIF R$</th>
+        <th colspan="3" id="totalprodutoscif"></th>
+      </tr>
+	<tr class="bold">
+        <th class="left">VALOR TOTAL DO PRODUTO FOB R$</th>
         <th colspan="3" id="totalprodutos"></th>
       </tr>
-
         <tr class="bold">
-        <th class="left">VALOR TOTAL DA NOTA FISCAL</th>
+        <th class="left">VALOR TOTAL DA NOTA FISCAL (SEM IBS/CBS/IS)</th>
+        <th colspan="3" id="totalNFsemIBSCBS"></th>
+      </tr>  
+        <tr class="bold">
+        <th class="left">VALOR TOTAL DA NOTA FISCAL (COM IBS/CBS/IS)</th>
         <th colspan="3" id="totalNF"></th>
       </tr>  
 
@@ -563,6 +570,7 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
       const totalIS1 = arred((cif + totalII) * taxaIS1);
 
       const totalEncargos = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalIS1 - totalIS1 + siscomex + afrmm + cide + antidumping + compensatorios + salvaguardas + outros);
+      const totalprodutoscif = arred(cif);
       const totalprodutos = arred(totalEncargos - totalIS1 + totalIS1);
 
       const fatorICMS = +(1 - taxaICMS).toFixed(4);
@@ -574,7 +582,8 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
       const totalCBS = arred((totalEncargos - totalIPI - totalPIS - totalCOFINS + totalIS1) * taxaCBS);
       const totalIS2 = arred((cif + totalII) * taxaIS2);
 
-      const totalNF = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalICMS + totalIBSM + totalIBSE + totalCBS + totalIS1);
+      const totalNFsemIBSCBS = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalICMS + afrmm + totalIBSM + siscomex);
+      const totalNF = arred(cif + totalII + totalIPI + totalPIS + totalCOFINS + totalICMS + afrmm + totalIBSM + siscomex + totalIBSE + totalCBS + totalIS1);
 
       // Atualiza DOM
       document.getElementById('totalFOB').textContent = totalFOB.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
@@ -602,6 +611,7 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
       document.getElementById('totalIS1').textContent = totalIS1.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
       document.getElementById('totalEncargos').textContent = totalEncargos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('totalprodutoscif').textContent = totalprodutoscif.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
       document.getElementById('totalprodutos').textContent = totalprodutos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
       document.getElementById('baseICMS').textContent = baseICMS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
@@ -620,6 +630,7 @@ const outros = parseFloat(document.getElementById('totalOutros')?.value.replace(
 
       document.getElementById('totalRT').textContent = (totalIBSM + totalIBSE + totalCBS + totalIS1).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
+      document.getElementById('totalNFsemIBSCBS').textContent = totalNFsemIBSCBS.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
       document.getElementById('totalNF').textContent = totalNF.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     }
 
